@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Call System</title>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background-color: #050805;
+            color: #00ff66;
+            font-family: system-ui, -apple-system, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .phone-frame {
+            width: 100%;
+            max-width: 380px;
+            height: 100%;
+            max-height: 700px;
+            background-color: #121212;
+            border-radius: 30px;
+            box-shadow: 0 10px 30px rgba(0,255,102,0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 2px solid #00ff66;
+            position: relative;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            background-color: #121212;
+            z-index: 2;
+        }
+
+        .hidden { display: none !important; }
+        .screen-hidden * { opacity: 0 !important; }
+        .screen-hidden { background: #000 !important; }
+
+        .whatsapp-bg { background-color: #0b141a; }
+
+        /* চ্যাট লিস্ট স্ক্রিন */
+        .whatsapp-top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #1f2c34;
+            color: #fff;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            background: #111b21;
+        }
+
+        .chat-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+        }
+        .chat-list-item:hover { background: rgba(0,255,102,0.1); }
+
+        .chat-list-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-list-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .chat-list-info h4 { margin: 0; font-size: 16px; color: #e9edef; }
+        .chat-list-info p { margin: 4px 0 0 0; font-size: 13px; color: #8696a0; }
+
+        /* চ্যাট রুম স্ক্রিন */
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 15px;
+            background: #1f2c34;
+            border-bottom: 1px solid rgba(0,255,102,0.3);
+        }
+
+        .chat-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header-left img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .chat-header-left h3 { margin: 0; font-size: 16px; color: #e9edef; }
+        .chat-header-left p { margin: 0; font-size: 11px; color: #00ff66; }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .header-icon-btn svg { width: 22px; height: 22px; fill: #aebac1; }
+        .header-icon-btn:hover svg { fill: #fff; }
+
+        .chat-body {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: #0b141a;
+        }
+
+        .message-bubble {
+            background: #202c33;
+            padding: 10px 14px;
+            border-radius: 10px;
+            max-width: 75%;
+            align-self: flex-start;
+            color: #e9edef;
+            font-size: 14px;
+        }
+
+        .chat-footer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background: #1f2c34;
+        }
+
+        .chat-footer input {
+            flex: 1;
+            background: #2a3942;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 15px;
+            color: #fff;
+            outline: none;
+            font-size: 14px;
+        }
+
+        /* ভিডিও ও অডিও কল স্ক্রিন */
+        .video-call-screen, .audio-call-screen {
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            position: absolute;
+            z-index: 10;
+        }
+        .video-call-screen { background: #000; }
+
+        .call-top-info {
+            z-index: 3;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin-top: 10px;
+        }
+        .call-top-info h3 { margin: 0; font-size: 16px; color: #fff; }
+        .call-status-text { font-size: 13px; color: #00ff66; margin-top: 2px; }
+
+        #fullScreenVideo {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #remoteVideo { width: 100%; height: 100%; object-fit: cover; }
+
+        .call-controls-bar {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background: rgba(20, 20, 20, 0.85);
+            width: 100%;
+            padding: 12px 10px;
+            border-radius: 30px;
+            margin-bottom: 10px;
+        }
+
+        .call-ctrl-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: none;
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .call-ctrl-btn.active { background: #fff; }
+        .call-ctrl-btn.active svg { fill: #000; }
+        .call-ctrl-btn svg { width: 20px; height: 20px; fill: #fff; }
+        .call-ctrl-btn.btn-hangup { background-color: #dc3545; }
+
+        .audio-profile-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+        }
+        .audio-profile-img {
+            width: 140px; height: 140px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid rgba(255,255,255,0.1);
+        }
+
+        .info-bar {
+            background: #1f2c34;
+            padding: 6px;
+            font-size: 11px;
+            color: #8696a0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="phone-frame" id="phoneBox">
+        <!-- ধাপ ১: চ্যাট লিস্ট স্ক্রিন -->
+        <div id="imoListScreen" class="screen">
+            <div class="whatsapp-top-nav">
+                <span>WhatsApp</span>
+            </div>
+            <div class="chat-list">
+                <div class="chat-list-item" onclick="openChatScreen()">
+                    <div class="chat-list-left">
+                        <img src="https://i.ibb.co.com/gMGsJmZS/Screenshot-20260903-224009-com-imo-android-imoimhd-Full-Screen-Profile-Activity-1.jpg" class="chat-list-avatar" alt="Rooposhi">
+                        <div class="chat-list-info">
+                            <h4>রূপসী 💖</h4>
+                            <p>Voice message (0:05)</p>
+                        </div>
+                    </div>
+                    <span style="font-size: 12px; color: #8696a0;">8:36 pm</span>
+                </div>
+            </div>
+            <div class="info-bar">টাচ করুন অথবা কিবোর্ডে [স্টার *] চেপে স্ক্রিন হাইড/শো করুন</div>
+        </div>
+
+        <!-- ধাপ ২: চ্যাট রুম স্ক্রিন -->
+        <div id="chatRoomScreen" class="screen hidden">
+            <div class="chat-header">
+                <div class="chat-header-left">
+                    <button onclick="goBackToList()" class="header-icon-btn" style="color:#fff; font-size:18px;">←</button>
+                    <img src="https://i.ibb.co.com/gMGsJmZS/Screenshot-20260903-224009-com-imo-android-imoimhd-Full-Screen-Profile-Activity-1.jpg" alt="Rooposhi">
+                    <div>
+                        <h3>রূপসী 💖</h3>
+                        <p>Online</p>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <button class="header-icon-btn" onclick="startCall('video')" title="Video Call">
+                        <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
+                    </button>
+                    <button class="header-icon-btn" onclick="startCall('audio')" title="Audio Call">
+                        <svg viewBox="0 0 24 24"><path d="M20.01 15.38c-1.23 0-2.42-.2-3.53-.56a.977.977 0 00-1.01.24l-1.57 1.97c-2.83-1.35-5.48-3.9-6.89-6.83l1.95-1.66c.27-.28.35-.67.24-1.02-.37-1.11-.56-2.3-.56-3.53 0-.54-.45-.99-0.99-.99H4.19C3.65 3 3 3.24 3 3.99 3 13.28 10.73 21 20.01 21c.71 0 .99-.63.99-1.18v-3.45c0-.54-.45-.99-0.99-.99z"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="chat-body" id="chatBodyContainer">
+                <div class="message-bubble">ওপরের ভিডিও বা অডিও কল আইকনে চাপ দিন</div>
+            </div>
+
+            <div class="chat-footer">
+                <input type="text" id="chatInputBox" placeholder="Message">
+            </div>
+        </div>
+
+        <!-- ধাপ ৩: ভিডিও কল স্ক্রিন -->
+        <div id="videoCallScreen" class="screen video-call-screen hidden">
+            <div class="call-top-info">
+                <h3>রূপসী 💖</h3>
+                <div id="videoCallStatus" class="call-status-text">Ringing ...</div>
+            </div>
+            <div id="fullScreenVideo">
+                <video id="remoteVideo" autoplay playsinline></video>
+            </div>
+            <div class="call-controls-bar">
+                <button class="call-ctrl-btn" id="vidMuteBtn" onclick="toggleMute()"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></button>
+                <button class="call-ctrl-btn" onclick="toggleVideo()"><svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></button>
+                <button class="call-ctrl-btn" onclick="switchCamera()"><svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0-2-.9-2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></button>
+                <button class="call-ctrl-btn btn-hangup" onclick="endCall()"><svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.51-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></button>
+            </div>
+        </div>
+
+        <!-- ধাপ ৪: অডিও কল স্ক্রিন -->
+        <div id="audioCallScreen" class="screen whatsapp-bg audio-call-screen hidden">
+            <div class="call-top-info" style="width: 100%;">
+                <h3>রূপসী 💖</h3>
+                <div id="audioCallStatus" class="call-status-text">Ringing ...</div>
+            </div>
+
+            <div class="audio-profile-container">
+                <img src="https://i.ibb.co.com/gMGsJmZS/Screenshot-20260903-224009-com-imo-android-imoimhd-Full-Screen-Profile-Activity-1.jpg" class="audio-profile-img" alt="Profile">
+            </div>
+
+            <div class="call-controls-bar">
+                <button class="call-ctrl-btn" id="audSpkBtn" onclick="toggleSpeaker()"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
+                <button class="call-ctrl-btn" onclick="startCall('video')"><svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></button>
+                <button class="call-ctrl-btn" id="audMuteBtn" onclick="toggleMute()"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></button>
+                <button class="call-ctrl-btn btn-hangup" onclick="endCall()"><svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.51-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let peer;
+        let myId = "";
+        const urlParams = new URLSearchParams(window.location.search);
+        const targetPeerId = urlParams.get('peer') === 'b' ? 'hacker_user_a' : 'hacker_user_b';
+        myId = urlParams.get('peer') === 'b' ? 'hacker_user_b' : 'hacker_user_a';
+
+        let currentCall = null;
+        let dataConn = null;
+        let localStream = null;
+        let incomingCallObj = null;
+        let isMuted = false;
+        let isSpeakerOn = false;
+        let isVideoOff = false;
+        let isHidden = false;
+
+        function initPeer() {
+            peer = new Peer(myId);
+            peer.on('open', () => { connectDataChannel(); });
+            peer.on('connection', (conn) => {
+                dataConn = conn;
+                setupDataConnectionEvents();
+            });
+            peer.on('call', (call) => {
+                incomingCallObj = call;
+                document.getElementById('imoListScreen').classList.add('hidden');
+                document.getElementById('chatRoomScreen').classList.add('hidden');
+                document.getElementById('videoCallScreen').classList.add('hidden');
+                document.getElementById('audioCallScreen').classList.remove('hidden');
+                document.getElementById('audioCallStatus').innerText = "Incoming Call...";
+            });
+        }
+
+        window.onload = () => { initPeer(); };
+
+        function connectDataChannel() {
+            if (!dataConn) {
+                dataConn = peer.connect(targetPeerId);
+                setupDataConnectionEvents();
+            }
+        }
+
+        function setupDataConnectionEvents() {
+            if (!dataConn) return;
+            dataConn.on('data', (message) => { appendMessage(message, 'incoming'); });
+        }
+
+        function appendMessage(text, type) {
+            const chatBody = document.getElementById('chatBodyContainer');
+            const bubble = document.createElement('div');
+            bubble.classList.add('message-bubble');
+            if (type === 'sent') bubble.classList.add('sent');
+            bubble.innerText = text;
+            chatBody.appendChild(bubble);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        function openChatScreen() {
+            document.getElementById('imoListScreen').classList.add('hidden');
+            document.getElementById('chatRoomScreen').classList.remove('hidden');
+            connectDataChannel();
+        }
+
+        function goBackToList() {
+            document.getElementById('chatRoomScreen').classList.add('hidden');
+            document.getElementById('imoListScreen').classList.remove('hidden');
+        }
+
+        async function startCall(type) {
+            document.getElementById('imoListScreen').classList.add('hidden');
+            document.getElementById('chatRoomScreen').classList.add('hidden');
+            
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: type === 'video', 
+                    audio: true 
+                });
+            } catch (e) {
+                localStream = new MediaStream();
+            }
+
+            if (type === 'video') {
+                document.getElementById('videoCallScreen').classList.remove('hidden');
+                document.getElementById('audioCallScreen').classList.add('hidden');
+                document.getElementById('videoCallStatus').innerText = "Ringing...";
+            } else {
+                document.getElementById('audioCallScreen').classList.remove('hidden');
+                document.getElementById('videoCallScreen').classList.add('hidden');
+                document.getElementById('audioCallStatus').innerText = "Ringing...";
+            }
+
+            try {
+                const call = peer.call(targetPeerId, localStream);
+                if (call) {
+                    currentCall = call;
+                    setupCallEvents(call, type);
+                }
+            } catch (err) {
+                console.log("Call error: ", err);
+            }
+        }
+
+        function setupCallEvents(call, type) {
+            call.on('stream', (remoteStream) => {
+                if (type === 'video') {
+                    document.getElementById('videoCallStatus').innerText = "Connected";
+                    document.getElementById('remoteVideo').srcObject = remoteStream;
+                } else {
+                    document.getElementById('audioCallStatus').innerText = "Connected";
+                }
+            });
+            call.on('close', () => { endCall(); });
+        }
+
+        function toggleMute() {
+            if (localStream) {
+                isMuted = !isMuted;
+                localStream.getAudioTracks().forEach(track => track.enabled = !isMuted);
+                document.getElementById('vidMuteBtn').classList.toggle('active', isMuted);
+                document.getElementById('audMuteBtn').classList.toggle('active', isMuted);
+            }
+        }
+
+        function toggleVideo() {
+            if (localStream) {
+                isVideoOff = !isVideoOff;
+                localStream.getVideoTracks().forEach(track => track.enabled = !isVideoOff);
+            }
+        }
+
+        function toggleSpeaker() {
+            isSpeakerOn = !isSpeakerOn;
+            document.getElementById('audSpkBtn').classList.toggle('active', isSpeakerOn);
+        }
+
+        function switchCamera() {
+            alert("ক্যামেরা সুইচিং সচল আছে!");
+        }
+
+        function endCall() {
+            if (currentCall) currentCall.close();
+            if (incomingCallObj) { incomingCallObj.close(); incomingCallObj = null; }
+            if (localStream) localStream.getTracks().forEach(track => track.stop());
+            
+            document.getElementById('videoCallScreen').classList.add('hidden');
+            document.getElementById('audioCallScreen').classList.add('hidden');
+            document.getElementById('chatRoomScreen').classList.remove('hidden');
+        }
+
+        // কিবোর্ড শর্টকাট: স্টার (*) বাটন চাপলে স্ক্রিন এক চাপেই হাইড/শো হবে
+        document.addEventListener('keydown', (e) => {
+            if (e.key === '*' || e.key === 'Shift') {
+                isHidden = !isHidden;
+                const box = document.getElementById('phoneBox');
+                if (isHidden) {
+                    box.classList.add('screen-hidden');
+                } else {
+                    box.classList.remove('screen-hidden');
+                }
+            }
+        });
+    </script>
+</body>
+</html>
