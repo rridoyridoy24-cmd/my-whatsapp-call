@@ -313,7 +313,6 @@
             background: var(--nav-bg, #1f2c34); padding: 6px; font-size: 11px; color: #8696a0; text-align: center; display: flex; justify-content: space-around; align-items: center;
         }
 
-        /* প্রোগ্রেস বার স্টাইল */
         .progress-container {
             width: 100%; background: rgba(255,255,255,0.2); border-radius: 4px; height: 6px; margin-top: 5px; overflow: hidden;
         }
@@ -331,7 +330,6 @@
         <div id="imoListScreen" class="screen">
             <div class="whatsapp-top-nav">
                 <span>WhatsApp</span>
-                <!-- আইডি সুইচ অপশন ড্রপডাউন -->
                 <div>
                     <select id="userSwitchSelect" class="id-switcher-select" onchange="changeActiveUserIdentity()">
                         <option value="hridoy">হৃদয়</option>
@@ -395,7 +393,6 @@
                     <input type="file" id="mediaFileInput" accept="image/*,video/*" style="display: none;" onchange="sendMediaFile(this)">
                 </label>
 
-                <!-- ভয়েস রেকর্ড ও টাইমার উইজেট -->
                 <div style="display: flex; align-items: center; gap: 4px;">
                     <button id="voiceRecordBtn" class="header-icon-btn" onmousedown="startVoiceRecording()" onmouseup="stopVoiceRecording()" ontouchstart="startVoiceRecording()" ontouchend="stopVoiceRecording()" title="Record Voice">
                         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1s-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg>
@@ -514,6 +511,7 @@
         }
         updateCursorPos();
 
+        // কিবোর্ড নেভিগেশন ও কার্সর কন্ট্রোল সিস্টেম (সংশোধিত)
         document.addEventListener('keydown', (e) => {
             initAudioContext();
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' '].includes(e.key)) {
@@ -531,12 +529,16 @@
                 const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
                 if (elementUnderCursor) {
                     elementUnderCursor.focus();
-                    elementUnderCursor.click();
+                    
                     if (elementUnderCursor.tagName === 'SELECT') {
-                        const event = new MouseEvent('mousedown', { bubbles: true });
-                        elementUnderCursor.dispatchEvent(event);
-                    } else if (elementUnderCursor.tagName === 'INPUT') { 
-                        elementUnderCursor.focus(); 
+                        // সিলেক্ট ড্রপডাউনের জন্য বিশেষভাবে মাউস ইভেন্ট ও ফোকাস ট্রিগার করা
+                        elementUnderCursor.click();
+                        const evt = new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
+                        elementUnderCursor.dispatchEvent(evt);
+                    } else if (elementUnderCursor.tagName === 'INPUT' && elementUnderCursor.type !== 'file') {
+                        elementUnderCursor.focus();
+                    } else {
+                        elementUnderCursor.click();
                     }
                 }
                 e.preventDefault();
@@ -552,7 +554,6 @@
         let myId = "phone_user_1";
         let targetPeerId = "phone_user_2";
 
-        // আইডি সুইচ লজিক (হৃদয় ও রূপসী)
         function changeActiveUserIdentity() {
             const selectVal = document.getElementById('userSwitchSelect').value;
             if (selectVal === 'hridoy') {
@@ -730,13 +731,13 @@
             }
             appendMessage(text, 'sent', 'text', msgId);
             input.value = '';
+            input.focus();
         }
 
         function handleChatInput(e) {
             if (e.key === 'Enter') { sendTextMessage(); }
         }
 
-        // ছবি বা ভিডিও প্রোগ্রেস বারসহ আপলোড
         function sendMediaFile(input) {
             const file = input.files[0];
             if (!file) return;
@@ -806,7 +807,6 @@
             }
         }
 
-        // ভয়েস নোট লাইভ রেকর্ডিং টাইমারসহ ফাংশন
         async function startVoiceRecording() {
             const btn = document.getElementById('voiceRecordBtn');
             const timerEl = document.getElementById('recordingTimer');
