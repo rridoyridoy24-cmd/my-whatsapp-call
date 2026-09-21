@@ -530,8 +530,16 @@
             else if (e.key === 'Enter' || e.key === ' ') {
                 const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
                 if (elementUnderCursor) {
-                    elementUnderCursor.click();
-                    if(elementUnderCursor.tagName === 'INPUT') { elementUnderCursor.focus(); }
+                    if (elementUnderCursor.tagName === 'SELECT') {
+                        elementUnderCursor.focus();
+                        const event = new MouseEvent('mousedown', { bubbles: true });
+                        elementUnderCursor.dispatchEvent(event);
+                    } else {
+                        elementUnderCursor.click();
+                        if (elementUnderCursor.tagName === 'INPUT') { 
+                            elementUnderCursor.focus(); 
+                        }
+                    }
                 }
                 e.preventDefault();
             } else if (e.key === '*' || e.key === 'Shift') {
@@ -554,15 +562,15 @@
                 targetPeerId = "phone_user_2";
                 document.getElementById('chatPartnerName').innerText = "রূপসী 💖";
                 document.getElementById('roomPartnerTitle').innerText = "রূপসী 💖";
-                if(videoCallPartnerName) document.getElementById('videoCallPartnerName').innerText = "রূপসী 💖";
-                if(audioCallPartnerName) document.getElementById('audioCallPartnerName').innerText = "রূপসী 💖";
+                if(document.getElementById('videoCallPartnerName')) document.getElementById('videoCallPartnerName').innerText = "রূপসী 💖";
+                if(document.getElementById('audioCallPartnerName')) document.getElementById('audioCallPartnerName').innerText = "রূপসী 💖";
             } else {
                 myId = "phone_user_2";
                 targetPeerId = "phone_user_1";
                 document.getElementById('chatPartnerName').innerText = "হৃদয় 💙";
                 document.getElementById('roomPartnerTitle').innerText = "হৃদয় 💙";
-                if(videoCallPartnerName) document.getElementById('videoCallPartnerName').innerText = "হৃদয় 💙";
-                if(audioCallPartnerName) document.getElementById('audioCallPartnerName').innerText = "হৃদয় 💙";
+                if(document.getElementById('videoCallPartnerName')) document.getElementById('videoCallPartnerName').innerText = "হৃদয় 💙";
+                if(document.getElementById('audioCallPartnerName')) document.getElementById('audioCallPartnerName').innerText = "হৃদয় 💙";
             }
             if (peer) {
                 peer.destroy();
