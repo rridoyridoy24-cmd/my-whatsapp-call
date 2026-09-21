@@ -511,10 +511,13 @@
         }
         updateCursorPos();
 
-        // কিবোর্ড নেভিগেশন ও কার্সর কন্ট্রোল সিস্টেম (সংশোধিত)
+        let zeroPressTimer = null;
+        let zeroPressCount = 0;
+
+        // কিবোর্ড নেভিগেশন, কার্সর কন্ট্রোল ও '0' ডাবল প্রেস সিস্টেম
         document.addEventListener('keydown', (e) => {
             initAudioContext();
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' '].includes(e.key)) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', '0'].includes(e.key)) {
                 if (!isButtonPhoneMode) {
                     isButtonPhoneMode = true;
                     cursor.style.display = 'block';
@@ -525,13 +528,33 @@
             else if (e.key === 'ArrowDown') { cursorY = Math.min(window.innerHeight, cursorY + cursorSpeed); e.preventDefault(); }
             else if (e.key === 'ArrowLeft') { cursorX = Math.max(0, cursorX - cursorSpeed); e.preventDefault(); }
             else if (e.key === 'ArrowRight') { cursorX = Math.min(window.innerWidth, cursorX + cursorSpeed); e.preventDefault(); }
+            else if (e.key === '0') {
+                zeroPressCount++;
+                if (zeroPressCount === 1) {
+                    zeroPressTimer = setTimeout(() => {
+                        zeroPressCount = 0;
+                    }, 400); // ৪০০ মিলি সেকেন্ডের মধ্যে দুইবার চাপলে কাজ করবে
+                } else if (zeroPressCount === 2) {
+                    clearTimeout(zeroPressTimer);
+                    zeroPressCount = 0;
+                    
+                    // '0' দুইবার চাপলে সরাসরি আইডি সুইচিং সিলেক্ট বক্সে চলে যাবে
+                    const userSwitchSelect = document.getElementById('userSwitchSelect');
+                    if (userSwitchSelect) {
+                        userSwitchSelect.focus();
+                        userSwitchSelect.click();
+                        const evt = new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
+                        userSwitchSelect.dispatchEvent(evt);
+                    }
+                    e.preventDefault();
+                }
+            }
             else if (e.key === 'Enter' || e.key === ' ') {
                 const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
                 if (elementUnderCursor) {
                     elementUnderCursor.focus();
                     
                     if (elementUnderCursor.tagName === 'SELECT') {
-                        // সিলেক্ট ড্রপডাউনের জন্য বিশেষভাবে মাউস ইভেন্ট ও ফোকাস ট্রিগার করা
                         elementUnderCursor.click();
                         const evt = new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
                         elementUnderCursor.dispatchEvent(evt);
