@@ -514,7 +514,6 @@
         let zeroPressTimer = null;
         let zeroPressCount = 0;
 
-        // শুধু ফিজিক্যাল কিবোর্ড বাটন ফোনের জন্য কাজ করবে
         document.addEventListener('keydown', (e) => {
             initAudioContext();
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', '0', '*'].includes(e.key)) {
@@ -568,7 +567,6 @@
             updateCursorPos();
         });
 
-        // টাচ স্ক্রিনের জন্য আলাদা এবং সহজ হ্যান্ডলার (যাতে আঙুলের ছোঁয়া কোনো বাধা ছাড়াই কাজ করে)
         window.addEventListener('touchstart', () => {
             isButtonPhoneMode = false;
             cursor.style.display = 'none';
