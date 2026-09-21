@@ -326,7 +326,6 @@
     <div id="virtualCursor"></div>
 
     <div class="phone-frame" id="phoneBox">
-        <!-- চ্যাট লিস্ট স্ক্রিন -->
         <div id="imoListScreen" class="screen">
             <div class="whatsapp-top-nav">
                 <span>WhatsApp</span>
@@ -353,7 +352,6 @@
             <div class="info-bar" id="deviceIdBar">স্ট্যাটাস: ডিসকানেক্টেড</div>
         </div>
 
-        <!-- চ্যাট রুম স্ক্রিন -->
         <div id="chatRoomScreen" class="screen hidden">
             <div class="chat-header">
                 <div class="chat-header-left">
@@ -408,7 +406,6 @@
             </div>
         </div>
 
-        <!-- ভিডিও কল স্ক্রিন -->
         <div id="videoCallScreen" class="screen video-call-screen hidden">
             <div class="call-top-info">
                 <h3 id="videoCallPartnerName">চ্যাট পার্টনার</h3>
@@ -426,7 +423,6 @@
             </div>
         </div>
 
-        <!-- অডিও কল স্ক্রিন -->
         <div id="audioCallScreen" class="screen whatsapp-bg audio-call-screen hidden">
             <div class="call-top-info" style="width: 100%;">
                 <h3 id="audioCallPartnerName">চ্যাট পার্টনার</h3>
@@ -533,12 +529,11 @@
                 if (zeroPressCount === 1) {
                     zeroPressTimer = setTimeout(() => {
                         zeroPressCount = 0;
-                    }, 400); // ৪০০ মিলি সেকেন্ডের মধ্যে দুইবার চাপলে কাজ করবে
+                    }, 400); 
                 } else if (zeroPressCount === 2) {
                     clearTimeout(zeroPressTimer);
                     zeroPressCount = 0;
                     
-                    // '0' দুইবার চাপলে সরাসরি আইডি সুইচিং সিলেক্ট বক্সে চলে যাবে
                     const userSwitchSelect = document.getElementById('userSwitchSelect');
                     if (userSwitchSelect) {
                         userSwitchSelect.focus();
@@ -558,10 +553,17 @@
                         elementUnderCursor.click();
                         const evt = new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
                         elementUnderCursor.dispatchEvent(evt);
-                    } else if (elementUnderCursor.tagName === 'INPUT' && elementUnderCursor.type !== 'file') {
-                        elementUnderCursor.focus();
                     } else {
                         elementUnderCursor.click();
+                        
+                        const clickEvent = new MouseEvent('click', {
+                            view: window,
+                            bubbles: true,
+                            cancelable: true,
+                            clientX: cursorX,
+                            clientY: cursorY
+                        });
+                        elementUnderCursor.dispatchEvent(clickEvent);
                     }
                 }
                 e.preventDefault();
