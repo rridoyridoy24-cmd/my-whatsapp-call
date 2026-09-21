@@ -530,15 +530,13 @@
             else if (e.key === 'Enter' || e.key === ' ') {
                 const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
                 if (elementUnderCursor) {
+                    elementUnderCursor.focus();
+                    elementUnderCursor.click();
                     if (elementUnderCursor.tagName === 'SELECT') {
-                        elementUnderCursor.focus();
                         const event = new MouseEvent('mousedown', { bubbles: true });
                         elementUnderCursor.dispatchEvent(event);
-                    } else {
-                        elementUnderCursor.click();
-                        if (elementUnderCursor.tagName === 'INPUT') { 
-                            elementUnderCursor.focus(); 
-                        }
+                    } else if (elementUnderCursor.tagName === 'INPUT') { 
+                        elementUnderCursor.focus(); 
                     }
                 }
                 e.preventDefault();
