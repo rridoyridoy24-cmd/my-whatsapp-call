@@ -326,6 +326,7 @@
     <div id="virtualCursor"></div>
 
     <div class="phone-frame" id="phoneBox">
+        <!-- চ্যাট লিস্ট স্ক্রিন -->
         <div id="imoListScreen" class="screen">
             <div class="whatsapp-top-nav">
                 <span>WhatsApp</span>
@@ -352,6 +353,7 @@
             <div class="info-bar" id="deviceIdBar">স্ট্যাটাস: ডিসকানেক্টেড</div>
         </div>
 
+        <!-- চ্যাট রুম স্ক্রিন -->
         <div id="chatRoomScreen" class="screen hidden">
             <div class="chat-header">
                 <div class="chat-header-left">
@@ -406,6 +408,7 @@
             </div>
         </div>
 
+        <!-- ভিডিও কল স্ক্রিন -->
         <div id="videoCallScreen" class="screen video-call-screen hidden">
             <div class="call-top-info">
                 <h3 id="videoCallPartnerName">চ্যাট পার্টনার</h3>
@@ -418,11 +421,12 @@
             <div class="call-controls-bar">
                 <button class="call-ctrl-btn" id="vidMuteBtn" onclick="toggleMute()"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></button>
                 <button class="call-ctrl-btn" onclick="toggleVideo()"><svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></button>
-                <button class="call-ctrl-btn" onclick="switchCamera()"><svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0-2-.9-2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></button>
+                <button class="call-ctrl-btn" onclick="switchCamera()"><svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0-2-.9-2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5 z"/></svg></button>
                 <button class="call-ctrl-btn btn-hangup" onclick="endCall()"><svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.51-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></button>
             </div>
         </div>
 
+        <!-- অডিও কল স্ক্রিন -->
         <div id="audioCallScreen" class="screen whatsapp-bg audio-call-screen hidden">
             <div class="call-top-info" style="width: 100%;">
                 <h3 id="audioCallPartnerName">চ্যাট পার্টনার</h3>
@@ -510,10 +514,10 @@
         let zeroPressTimer = null;
         let zeroPressCount = 0;
 
-        // কিবোর্ড নেভিগেশন, কার্সর কন্ট্রোল ও '0' ডাবল প্রেস সিস্টেম
+        // শুধু ফিজিক্যাল কিবোর্ড বাটন ফোনের জন্য কাজ করবে
         document.addEventListener('keydown', (e) => {
             initAudioContext();
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', '0'].includes(e.key)) {
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', '0', '*'].includes(e.key)) {
                 if (!isButtonPhoneMode) {
                     isButtonPhoneMode = true;
                     cursor.style.display = 'block';
@@ -527,53 +531,49 @@
             else if (e.key === '0') {
                 zeroPressCount++;
                 if (zeroPressCount === 1) {
-                    zeroPressTimer = setTimeout(() => {
-                        zeroPressCount = 0;
-                    }, 400); 
+                    zeroPressTimer = setTimeout(() => { zeroPressCount = 0; }, 400); 
                 } else if (zeroPressCount === 2) {
                     clearTimeout(zeroPressTimer);
                     zeroPressCount = 0;
-                    
                     const userSwitchSelect = document.getElementById('userSwitchSelect');
                     if (userSwitchSelect) {
                         userSwitchSelect.focus();
                         userSwitchSelect.click();
-                        const evt = new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
-                        userSwitchSelect.dispatchEvent(evt);
                     }
                     e.preventDefault();
                 }
             }
             else if (e.key === 'Enter' || e.key === ' ') {
-                const elementUnderCursor = document.elementFromPoint(cursorX, cursorY);
-                if (elementUnderCursor) {
-                    elementUnderCursor.focus();
-                    
-                    if (elementUnderCursor.tagName === 'SELECT') {
-                        elementUnderCursor.click();
-                        const evt = new MouseEvent('mousedown', { bubbles: true, cancelable: true, view: window });
-                        elementUnderCursor.dispatchEvent(evt);
-                    } else {
-                        elementUnderCursor.click();
-                        
-                        const clickEvent = new MouseEvent('click', {
-                            view: window,
-                            bubbles: true,
-                            cancelable: true,
-                            clientX: cursorX,
-                            clientY: cursorY
-                        });
-                        elementUnderCursor.dispatchEvent(clickEvent);
+                cursor.style.display = 'none';
+                let targetEl = document.elementFromPoint(cursorX, cursorY);
+                cursor.style.display = 'block';
+
+                if (!targetEl || targetEl === document.body || targetEl === document.documentElement) {
+                    targetEl = document.activeElement;
+                }
+
+                if (targetEl && targetEl !== document.body) {
+                    const clickableItem = targetEl.closest('.chat-list-item, button, input, select, label, a') || targetEl;
+                    try { clickableItem.focus(); } catch(err) {}
+                    try { clickableItem.click(); } catch(err) {}
+
+                    if (clickableItem.classList.contains('chat-list-item') || clickableItem.closest('.chat-list-item')) {
+                        try { openChatScreen(); } catch(err) {}
                     }
                 }
                 e.preventDefault();
-            } else if (e.key === '*' || e.key === 'Shift') {
+            } else if (e.key === '*') {
                 document.getElementById('phoneBox').classList.toggle('screen-hidden');
             }
             updateCursorPos();
         });
 
-        document.addEventListener('click', () => { initAudioContext(); });
+        // টাচ স্ক্রিনের জন্য আলাদা এবং সহজ হ্যান্ডলার (যাতে আঙুলের ছোঁয়া কোনো বাধা ছাড়াই কাজ করে)
+        window.addEventListener('touchstart', () => {
+            isButtonPhoneMode = false;
+            cursor.style.display = 'none';
+            initAudioContext();
+        }, { passive: true });
 
         let peer;
         let myId = "phone_user_1";
@@ -600,6 +600,22 @@
                 peer.destroy();
             }
             initPeer();
+        }
+
+        window.onload = () => { changeActiveUserIdentity(); };
+
+        function updateConnectionStatus(statusText, color) {
+            const bar = document.getElementById('deviceIdBar');
+            const roomStatus = document.getElementById('roomOnlineStatus');
+            const lastSeen = document.getElementById('lastSeenText');
+            if(bar) bar.innerText = `স্ট্যাটাস: ${statusText} | ID: ${myId}`;
+            if(roomStatus) {
+                roomStatus.innerText = statusText === "Connected" ? "Online" : "Disconnected";
+                roomStatus.style.color = color;
+            }
+            if(lastSeen) {
+                lastSeen.innerText = statusText === "Connected" ? "Active" : "Last seen recently";
+            }
         }
 
         let currentCall = null;
@@ -644,22 +660,6 @@
                 document.getElementById('audioCallStatus').innerText = "Incoming Call...";
                 document.getElementById('answerBtn').classList.remove('hidden');
             });
-        }
-
-        window.onload = () => { changeActiveUserIdentity(); };
-
-        function updateConnectionStatus(statusText, color) {
-            const bar = document.getElementById('deviceIdBar');
-            const roomStatus = document.getElementById('roomOnlineStatus');
-            const lastSeen = document.getElementById('lastSeenText');
-            if(bar) bar.innerText = `স্ট্যাটাস: ${statusText} | ID: ${myId}`;
-            if(roomStatus) {
-                roomStatus.innerText = statusText === "Connected" ? "Online" : "Disconnected";
-                roomStatus.style.color = color;
-            }
-            if(lastSeen) {
-                lastSeen.innerText = statusText === "Connected" ? "Active" : "Last seen recently";
-            }
         }
 
         function connectDataChannel() {
