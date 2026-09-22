@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live P2P Video Call & Chat</title>
+    <title>Simple Chat & Call</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -44,12 +44,9 @@
         .chat-list { flex: 1; overflow-y: auto; background: #111b21; }
 
         .chat-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;
+            padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;
         }
         .chat-item:focus, .chat-item:hover { background: rgba(0,255,102,0.2); outline: 2px solid #00ff66; }
-
-        .chat-avatar { width: 50px; height: 50px; border-radius: 50%; border: 2px solid #00ff66; object-fit: cover; }
 
         .chat-header {
             display: flex; align-items: center; justify-content: space-between;
@@ -94,7 +91,7 @@
 
         .call-controls { 
             position: relative; z-index: 6; display: flex; gap: 15px; margin-bottom: 25px; 
-            background: rgba(0,0,0,0.5); padding: 10px; border-radius: 20px;
+            background: rgba(0,0,0,0.6); padding: 10px; border-radius: 20px;
         }
         .ctrl-btn { background: #fff; border: none; padding: 12px 22px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 14px; }
         .ctrl-btn:focus { outline: 3px solid #00ff66; }
@@ -105,27 +102,24 @@
 <body>
 
     <div class="phone-frame">
-        <!-- ১. হোম স্ক্রিন / লিস্ট -->
+        <!-- হোম স্ক্রিন -->
         <div id="listScreen" class="screen">
             <div class="top-nav">
-                <span>Live Call App</span>
+                <span>Simple App</span>
                 <select id="userSelect" class="id-select" onchange="changeUser()">
-                    <option value="id1">ডিভাইস ১ (হৃদয়)</option>
-                    <option value="id2">ডিভাইস ২ (রূপসী)</option>
+                    <option value="id1">আইডি ১ (হৃদয়)</option>
+                    <option value="id2">আইডি ২ (রূপসী)</option>
                 </select>
             </div>
             <div class="chat-list">
                 <div class="chat-item" tabindex="0" onclick="openChat()" id="partnerItem">
-                    <img src="https://i.ibb.co.com/gMGsJmZS/Screenshot-20260903-224009-com-imo-android-imoimhd-Full-Screen-Profile-Activity-1.jpg" class="chat-avatar">
-                    <div>
-                        <h4 id="partnerName" style="margin:0; color:#fff;">পার্টনার</h4>
-                        <p style="margin:4px 0 0 0; font-size:12px; color:#8696a0;" id="statusText">অনলাইন হচ্ছে...</p>
-                    </div>
+                    <h4 id="partnerName" style="margin:0; color:#fff; font-size:16px;">পার্টনার</h4>
+                    <p style="margin:5px 0 0 0; font-size:12px; color:#8696a0;" id="statusText">অনলাইন হচ্ছে...</p>
                 </div>
             </div>
         </div>
 
-        <!-- ২. চ্যাট স্ক্রিন -->
+        <!-- চ্যাট স্ক্রিন -->
         <div id="chatScreen" class="screen hidden">
             <div class="chat-header">
                 <div style="display: flex; align-items: center; gap: 8px;">
@@ -133,12 +127,12 @@
                     <h3 id="roomTitle" style="margin:0; font-size:14px; color:#fff;">পার্টনার</h3>
                 </div>
                 <div>
-                    <button class="action-btn" tabindex="0" onclick="startCall()">📞 লাইভ কল দিন</button>
+                    <button class="action-btn" tabindex="0" onclick="startCall()">📞 কল দিন</button>
                 </div>
             </div>
 
             <div class="chat-body" id="chatBody">
-                <div class="bubble">চ্যাট শুরু হয়েছে। উপরের "লাইভ কল দিন" বাটনে চাপ দিয়ে কথা বলতে পারেন।</div>
+                <div class="bubble">চ্যাট শুরু হয়েছে। উপরের "কল দিন" বাটনে চাপ দিয়ে কথা বলুন।</div>
             </div>
 
             <div class="chat-footer">
@@ -147,18 +141,16 @@
             </div>
         </div>
 
-        <!-- ৩. কল স্ক্রিন (রিসিভ ও কাটার অপশন সহ) -->
+        <!-- কল স্ক্রিন -->
         <div id="callScreen" class="screen call-screen hidden">
             <div style="z-index: 3; background: rgba(0,0,0,0.7); padding: 12px; border-radius: 10px; width: 100%;">
-                <h3 id="callTitle" style="margin:0; color:#fff;">লাইভ কল চলছে...</h3>
+                <h3 id="callTitle" style="margin:0; color:#fff;">কল চলছে...</h3>
             </div>
             <video id="remoteVideo" autoplay playsinline></video>
             <video id="localVideo" autoplay playsinline muted></video>
             
             <div class="call-controls">
-                <!-- কল রিসিভ করার বাটন -->
                 <button class="ctrl-btn accept" id="answerBtn" tabindex="0" onclick="answerCall()" style="display: none;">রিসিভ করুন</button>
-                <!-- কল কেটে দেওয়ার বাটন -->
                 <button class="ctrl-btn hangup" tabindex="0" onclick="endCall()">কেটে দিন</button>
             </div>
         </div>
@@ -195,7 +187,7 @@
             peer = new Peer(myId, { host: '0.peerjs.com', port: 443, secure: true });
 
             peer.on('open', () => {
-                document.getElementById('statusText').innerText = "অনلاین আছে";
+                document.getElementById('statusText').innerText = "অনলাইন আছে";
                 connectData();
             });
 
@@ -204,13 +196,10 @@
                 setupDataEvents();
             });
 
-            // কেউ কল দিলে এই অংশটি রান হবে এবং রিসিভ বাটন দেখাবে
             peer.on('call', (call) => {
                 incomingCallObj = call;
                 document.getElementById('callScreen').classList.remove('hidden');
-                document.getElementById('callTitle').innerText = "📞 লাইভ কল এসেছে...";
-                
-                // রিসিভ বাটন দৃশ্যমান করা হলো
+                document.getElementById('callTitle').innerText = "📞 কল এসেছে...";
                 document.getElementById('answerBtn').style.display = 'inline-block';
                 document.getElementById('answerBtn').focus();
             });
@@ -265,11 +254,10 @@
             body.scrollTop = body.scrollHeight;
         }
 
-        // নিজে কল দেওয়ার ফাংশন
         async function startCall() {
             document.getElementById('callScreen').classList.remove('hidden');
             document.getElementById('callTitle').innerText = "কলিং হচ্ছে...";
-            document.getElementById('answerBtn').style.display = 'none'; // নিজে কল দিলে রিসিভ বাটন লুকিয়ে থাকবে
+            document.getElementById('answerBtn').style.display = 'none';
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -283,10 +271,9 @@
             setupCallEvents(call);
         }
 
-        // কল রিসিভ করার ফাংশন
         async function answerCall() {
             document.getElementById('answerBtn').style.display = 'none';
-            document.getElementById('callTitle').innerText = "লাইভ কথা চলছে...";
+            document.getElementById('callTitle').innerText = "কথা চলছে...";
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -302,7 +289,7 @@
 
         function setupCallEvents(call) {
             call.on('stream', (remoteStream) => {
-                document.getElementById('callTitle').innerText = "লাইভ কথা চলছে...";
+                document.getElementById('callTitle').innerText = "কথা চলছে...";
                 document.getElementById('remoteVideo').srcObject = remoteStream;
             });
             call.on('close', () => { endCall(); });
