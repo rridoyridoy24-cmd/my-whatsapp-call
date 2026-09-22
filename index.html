@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WhatsApp & Advanced Hybrid Navigation System</title>
+    <title>WhatsApp & Dual-ID Calling System</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -82,8 +82,62 @@
         }
 
         .hidden { display: none !important; }
-        .screen-hidden * { opacity: 0 !important; }
-        .screen-hidden { background: #000 !important; }
+
+        .whatsapp-top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: var(--nav-bg, #1f2c34);
+            color: #fff;
+            font-size: 15px;
+            font-weight: bold;
+        }
+
+        .id-switcher-select {
+            background: #2a3942;
+            color: #00ff66;
+            border: 1px solid #00ff66;
+            padding: 5px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .chat-list {
+            flex: 1;
+            overflow-y: auto;
+            background: var(--list-bg, #111b21);
+        }
+
+        .chat-list-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            cursor: pointer;
+        }
+        .chat-list-item:hover, .chat-list-item:focus { background: rgba(0,255,102,0.2); outline: none; }
+
+        .chat-list-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-list-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #00ff66;
+        }
+
+        .chat-list-info h4 { margin: 0; font-size: 16px; color: var(--text-color, #e9edef); }
+        .chat-list-info p { margin: 4px 0 0 0; font-size: 13px; color: #8696a0; }
 
         .chat-header {
             display: flex;
@@ -127,7 +181,7 @@
             border-radius: 50%;
         }
         .header-icon-btn svg { width: 20px; height: 20px; fill: #aebac1; }
-        .header-icon-btn:hover { background: rgba(0,255,102,0.3); }
+        .header-icon-btn:hover, .header-icon-btn:focus { background: rgba(0,255,102,0.3); outline: none; }
         .header-icon-btn:hover svg { fill: #fff; }
 
         .chat-body {
@@ -219,8 +273,16 @@
         #remoteVideo { width: 100%; height: 100%; object-fit: cover; }
         
         #localVideo {
-            position: absolute; bottom: 80px; right: 20px; width: 90px; height: 130px;
-            object-fit: cover; border: 2px solid #00ff66; border-radius: 10px; z-index: 5; background: #222;
+            position: absolute;
+            bottom: 80px;
+            right: 20px;
+            width: 90px;
+            height: 130px;
+            object-fit: cover;
+            border: 2px solid #00ff66;
+            border-radius: 10px;
+            z-index: 5;
+            background: #222;
         }
 
         .call-controls-bar {
@@ -247,47 +309,64 @@
         }
 
         .info-bar {
-            background: var(--nav-bg, #1f2c34); padding: 6px; font-size: 11px; color: #8696a0; text-align: center;
+            background: var(--nav-bg, #1f2c34); padding: 6px; font-size: 11px; color: #8696a0; text-align: center; display: flex; justify-content: space-around; align-items: center;
         }
 
         .progress-container {
             width: 100%; background: rgba(255,255,255,0.2); border-radius: 4px; height: 6px; margin-top: 5px; overflow: hidden;
         }
-        .progress-bar { width: 0%; height: 100%; background: #00ff66; transition: width 0.2s; }
+        .progress-bar {
+            width: 0%; height: 100%; background: #00ff66; transition: width 0.2s;
+        }
     </style>
 </head>
 <body class="dark-theme">
 
     <div id="virtualCursor"></div>
 
-    <div class="phone-frame" id="phoneBox">
-        <div id="imoListScreen" class="screen hidden">
+    <div class="phone-frame">
+        <!-- চ্যাট লিস্ট স্ক্রিন -->
+        <div id="imoListScreen" class="screen">
             <div class="whatsapp-top-nav">
                 <span>WhatsApp</span>
                 <div>
+                    <!-- ইউজার আইডি সিলেকশন ড্রপডাউন -->
                     <select id="userSwitchSelect" class="id-switcher-select" onchange="changeActiveUserIdentity()">
-                        <option value="hridoy">হৃদয়</option>
-                        <option value="rooposhi">রূপসী</option>
+                        <option value="id1">আইডি ১ (হৃদয়)</option>
+                        <option value="id2">আইডি ২ (রূপসী)</option>
                     </select>
                 </div>
-                <button class="header-icon-btn" onclick="toggleTheme()" title="Toggle Theme">🌓</button>
+                <button class="header-icon-btn" onclick="toggleTheme()" title="Theme">🌓</button>
             </div>
             
-            <div class="chat-list" id="chatListContainer"></div>
-            <div class="info-bar" id="deviceIdBar">স্ট্যাটাস: ডিসকানেক্টেড</div>
+            <div class="chat-list" id="chatListContainer">
+                <!-- পার্টনারের চ্যাট বক্স (যাকে কল বা চ্যাট করা হবে) -->
+                <div class="chat-list-item" onclick="openChatScreen()" tabindex="0">
+                    <div class="chat-list-left">
+                        <img src="https://i.ibb.co.com/gMGsJmZS/Screenshot-20260903-224009-com-imo-android-imoimhd-Full-Screen-Profile-Activity-1.jpg" class="chat-list-avatar" alt="Avatar">
+                        <div class="chat-list-info">
+                            <h4 id="chatPartnerName">পার্টনার</h4>
+                            <p id="typingIndicatorPreview">মেসেজ পাঠাতে ট্যাপ করুন</p>
+                        </div>
+                    </div>
+                    <span style="font-size: 12px; color: #00ff66;" id="lastSeenText">Online</span>
+                </div>
+            </div>
+            <div class="info-bar" id="deviceIdBar">স্ট্যাটাস: কানেক্টিং...</div>
         </div>
 
-        <div id="chatRoomScreen" class="screen">
+        <!-- চ্যাট রুম স্ক্রিন -->
+        <div id="chatRoomScreen" class="screen hidden">
             <div class="chat-header">
                 <div class="chat-header-left">
+                    <button onclick="goBackToList()" class="header-icon-btn" style="color:#fff; font-size:18px;">←</button>
                     <img src="https://i.ibb.co.com/gMGsJmZS/Screenshot-20260903-224009-com-imo-android-imoimhd-Full-Screen-Profile-Activity-1.jpg" alt="Avatar">
                     <div>
-                        <h3 id="roomPartnerTitle">রূপসী 💖</h3>
-                        <p id="roomOnlineStatus">Connecting...</p>
+                        <h3 id="roomPartnerTitle">পার্টনার</h3>
+                        <p id="roomOnlineStatus">Online</p>
                     </div>
                 </div>
                 <div class="header-actions">
-                    <button class="header-icon-btn" onclick="toggleTheme()" title="Toggle Theme">🌓</button>
                     <button class="header-icon-btn" onclick="startCall('video')" title="Video Call">
                         <svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg>
                     </button>
@@ -298,7 +377,7 @@
             </div>
 
             <div class="chat-body" id="chatBodyContainer">
-                <div class="message-bubble">সরাসরি চ্যাট রুম ওপেন করা হয়েছে!</div>
+                <div class="message-bubble">চ্যাট শুরু হয়েছে! ভয়েস, ছবি ও ভিডিও পাঠানো যাবে।</div>
             </div>
 
             <div id="emojiPickerPanel" class="emoji-picker hidden">
@@ -311,13 +390,13 @@
             <div class="chat-footer">
                 <button class="header-icon-btn" onclick="toggleEmojiPicker()" title="Emoji">😊</button>
                 
-                <label class="file-upload-label" title="Upload Image/Video">
+                <label class="file-upload-label" title="Upload Media">
                     <svg viewBox="0 0 24 24"><path d="M18 4H6c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H6V6h12v12zM10 15l5-3-5-3v6z"/></svg>
                     <input type="file" id="mediaFileInput" accept="image/*,video/*" style="display: none;" onchange="sendMediaFile(this)">
                 </label>
 
                 <div style="display: flex; align-items: center; gap: 4px;">
-                    <button id="voiceRecordBtn" class="header-icon-btn" onmousedown="startVoiceRecording()" onmouseup="stopVoiceRecording()" ontouchstart="startVoiceRecording()" ontouchend="stopVoiceRecording()" title="Record Voice">
+                    <button id="voiceRecordBtn" class="header-icon-btn" onmousedown="startVoiceRecording()" onmouseup="stopVoiceRecording()" ontouchstart="startVoiceRecording()" ontouchend="stopVoiceRecording()" title="Voice">
                         <svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1s-5.3-2.1-5.3-5.1H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.49 6-3.31 6-6.72h-1.7z"/></svg>
                     </button>
                     <span id="recordingTimer" style="font-size: 11px; color: #ff4d4d; display: none;">0:00</span>
@@ -331,9 +410,10 @@
             </div>
         </div>
 
+        <!-- ভিডিও কল স্ক্রিন -->
         <div id="videoCallScreen" class="screen video-call-screen hidden">
             <div class="call-top-info">
-                <h3 id="videoCallPartnerName">চ্যাট পার্টনার</h3>
+                <h3 id="videoCallPartnerName">পার্টনার</h3>
                 <div id="videoCallStatus" class="call-status-text">Ringing ...</div>
             </div>
             <div id="fullScreenVideo">
@@ -343,14 +423,15 @@
             <div class="call-controls-bar">
                 <button class="call-ctrl-btn" id="vidMuteBtn" onclick="toggleMute()"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></button>
                 <button class="call-ctrl-btn" onclick="toggleVideo()"><svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></button>
-                <button class="call-ctrl-btn" onclick="switchCamera()"><svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0-2-.9-2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></button>
+                <button class="call-ctrl-btn" onclick="switchCamera()"><svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0-2-.9-2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5 z"/></svg></button>
                 <button class="call-ctrl-btn btn-hangup" onclick="endCall()"><svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.51-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></button>
             </div>
         </div>
 
+        <!-- অডিও কল স্ক্রিন -->
         <div id="audioCallScreen" class="screen audio-call-screen hidden">
             <div class="call-top-info" style="width: 100%;">
-                <h3 id="audioCallPartnerName">চ্যাট পার্টনার</h3>
+                <h3 id="audioCallPartnerName">পার্টনার</h3>
                 <div id="audioCallStatus" class="call-status-text">Ringing ...</div>
             </div>
             <div class="audio-profile-container">
@@ -432,9 +513,13 @@
         }
         updateCursorPos();
 
+        let zeroPressTimer = null;
+        let zeroPressCount = 0;
+
         document.addEventListener('keydown', (e) => {
             initAudioContext();
-            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', '*'].includes(e.key)) {
+
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', '1', '2', '*'].includes(e.key)) {
                 if (!isButtonPhoneMode) {
                     isButtonPhoneMode = true;
                     cursor.style.display = 'block';
@@ -445,6 +530,24 @@
             else if (e.key === 'ArrowDown') { cursorY = Math.min(window.innerHeight, cursorY + cursorSpeed); e.preventDefault(); }
             else if (e.key === 'ArrowLeft') { cursorX = Math.max(0, cursorX - cursorSpeed); e.preventDefault(); }
             else if (e.key === 'ArrowRight') { cursorX = Math.min(window.innerWidth, cursorX + cursorSpeed); e.preventDefault(); }
+            else if (e.key === '1') {
+                // কিবোর্ড থেকে '1' প্রেস করলে আইডি ১ সিলেক্ট হবে
+                const select = document.getElementById('userSwitchSelect');
+                if(select) {
+                    select.value = 'id1';
+                    changeActiveUserIdentity();
+                }
+                e.preventDefault();
+            }
+            else if (e.key === '2') {
+                // কিবোর্ড থেকে '2' প্রেস করলে আইডি ২ সিলেক্ট হবে
+                const select = document.getElementById('userSwitchSelect');
+                if(select) {
+                    select.value = 'id2';
+                    changeActiveUserIdentity();
+                }
+                e.preventDefault();
+            }
             else if (e.key === 'Enter' || e.key === ' ') {
                 cursor.style.display = 'none';
                 let targetEl = document.elementFromPoint(cursorX, cursorY);
@@ -455,13 +558,19 @@
                 }
 
                 if (targetEl && targetEl !== document.body) {
-                    const clickableItem = targetEl.closest('button, input, select, label, a') || targetEl;
-                    try { clickableItem.focus(); } catch(err) {}
-                    try { clickableItem.click(); } catch(err) {}
+                    const clickableItem = targetEl.closest('.chat-list-item, button, input, select, label, a') || targetEl;
+                    try { 
+                        clickableItem.focus();
+                        clickableItem.click(); 
+                    } catch(err) {}
+
+                    if (clickableItem.classList.contains('chat-list-item') || clickableItem.closest('.chat-list-item')) {
+                        try { openChatScreen(); } catch(err) {}
+                    }
                 }
                 e.preventDefault();
             } else if (e.key === '*') {
-                document.getElementById('phoneBox').classList.toggle('screen-hidden');
+                document.querySelector('.phone-frame').classList.toggle('screen-hidden');
             }
             updateCursorPos();
         });
@@ -473,20 +582,45 @@
         }, { passive: true });
 
         let peer;
-        let myId = "phone_user_1";
-        let targetPeerId = "phone_user_2";
+        let myId = "whatsapp_user_1";
+        let targetPeerId = "whatsapp_user_2";
 
-        window.onload = () => { 
-            initPeer(); 
-            // সরাসরি চ্যাট ইনপুট বক্সে ফোকাস করে দেওয়া যাতে টাইপ করা সহজ হয়
-            document.getElementById('chatInputBox').focus();
-        };
+        function changeActiveUserIdentity() {
+            const selectVal = document.getElementById('userSwitchSelect').value;
+            if (selectVal === 'id1') {
+                myId = "whatsapp_user_1";
+                targetPeerId = "whatsapp_user_2";
+                document.getElementById('chatPartnerName').innerText = "রূপসী 💖";
+                document.getElementById('roomPartnerTitle').innerText = "রূপসী 💖";
+                if(document.getElementById('videoCallPartnerName')) document.getElementById('videoCallPartnerName').innerText = "রূপসী 💖";
+                if(document.getElementById('audioCallPartnerName')) document.getElementById('audioCallPartnerName').innerText = "রূপসী 💖";
+            } else {
+                myId = "whatsapp_user_2";
+                targetPeerId = "whatsapp_user_1";
+                document.getElementById('chatPartnerName').innerText = "হৃদয় 💙";
+                document.getElementById('roomPartnerTitle').innerText = "হৃদয় 💙";
+                if(document.getElementById('videoCallPartnerName')) document.getElementById('videoCallPartnerName').innerText = "হৃদয় 💙";
+                if(document.getElementById('audioCallPartnerName')) document.getElementById('audioCallPartnerName').innerText = "হৃদয় 💙";
+            }
+            if (peer) {
+                peer.destroy();
+            }
+            initPeer();
+        }
+
+        window.onload = () => { changeActiveUserIdentity(); };
 
         function updateConnectionStatus(statusText, color) {
+            const bar = document.getElementById('deviceIdBar');
             const roomStatus = document.getElementById('roomOnlineStatus');
+            const lastSeen = document.getElementById('lastSeenText');
+            if(bar) bar.innerText = `স্ট্যাটাস: ${statusText} | বর্তমান আইডি: ${myId}`;
             if(roomStatus) {
                 roomStatus.innerText = statusText === "Connected" ? "Online" : "Disconnected";
                 roomStatus.style.color = color;
+            }
+            if(lastSeen) {
+                lastSeen.innerText = statusText === "Connected" ? "Online" : "Connecting...";
             }
         }
 
@@ -506,30 +640,41 @@
 
         function initPeer() {
             peer = new Peer(myId, {
+                host: '0.peerjs.com',
+                port: 443,
+                secure: true,
                 config: {
                     'iceServers': [
-                        { url: 'stun:stun.l.google.com:19302' },
-                        { stun: 'stun1.l.google.com:19302' }
+                        { urls: 'stun:stun.l.google.com:19302' },
+                        { urls: 'stun:stun1.l.google.com:19302' }
                     ]
                 }
             });
+
             peer.on('open', (id) => { 
                 updateConnectionStatus("Connected", "#00ff66");
                 connectDataChannel(); 
             });
+
             peer.on('connection', (conn) => {
                 dataConn = conn;
                 setupDataConnectionEvents();
                 updateConnectionStatus("Connected", "#00ff66");
             });
+
             peer.on('call', (call) => {
                 incomingCallObj = call;
                 startRingingTone();
+                document.getElementById('imoListScreen').classList.add('hidden');
                 document.getElementById('chatRoomScreen').classList.add('hidden');
                 document.getElementById('videoCallScreen').classList.add('hidden');
                 document.getElementById('audioCallScreen').classList.remove('hidden');
                 document.getElementById('audioCallStatus').innerText = "Incoming Call...";
                 document.getElementById('answerBtn').classList.remove('hidden');
+            });
+
+            peer.on('error', (err) => {
+                updateConnectionStatus("Error", "#ff4d4d");
             });
         }
 
@@ -562,10 +707,26 @@
                     applyReactionToMessage(data.msgId, data.emoji);
                 } else if (data.type === 'typing-start') {
                     document.getElementById('roomOnlineStatus').innerText = "টাইপ করছে...";
+                    document.getElementById('typingIndicatorPreview').innerText = "টাইপ করছে...";
                 } else if (data.type === 'typing-stop') {
                     document.getElementById('roomOnlineStatus').innerText = "Online";
+                    document.getElementById('typingIndicatorPreview').innerText = "মেসেজ পাঠাতে ট্যাপ করুন";
                 }
             });
+        }
+
+        function openChatScreen() {
+            document.getElementById('imoListScreen').classList.add('hidden');
+            document.getElementById('chatRoomScreen').classList.remove('hidden');
+            connectDataChannel();
+            if (dataConn && dataConn.open) {
+                dataConn.send({ type: 'read-receipt' });
+            }
+        }
+
+        function goBackToList() {
+            document.getElementById('chatRoomScreen').classList.add('hidden');
+            document.getElementById('imoListScreen').classList.remove('hidden');
         }
 
         function toggleEmojiPicker() {
@@ -818,7 +979,7 @@
         }
 
         async function startCall(type) {
-            initAudioContext();
+            document.getElementById('imoListScreen').classList.add('hidden');
             document.getElementById('chatRoomScreen').classList.add('hidden');
             startRingingTone();
             
@@ -853,7 +1014,6 @@
         }
 
         async function answerIncomingCall() {
-            initAudioContext();
             stopRingingTone();
             if (!incomingCallObj) return;
             try {
@@ -872,7 +1032,7 @@
             document.getElementById('videoCallStatus').innerText = "Connected";
             document.getElementById('answerBtn').classList.add('hidden');
             
-            setupCallEvents(currentCall, 'video');
+            setupCall, setupCallEvents(currentCall, 'video');
         }
 
         function setupCallEvents(call, type) {
@@ -910,7 +1070,7 @@
         }
 
         function switchCamera() {
-            alert("ক্যামেরা সুইচিং সচল আছে!");
+            alert("ক্যামেরা সুইচিং সচল!");
         }
 
         function endCall() {
