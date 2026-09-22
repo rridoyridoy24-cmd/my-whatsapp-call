@@ -114,7 +114,6 @@
             padding: 10px;
         }
 
-        /* থাম্বনেইল এবং ওকে বাটন এর বক্স */
         .chat-card-box {
             background: rgba(255, 255, 255, 0.03);
             border: 2px solid #2a3942;
@@ -152,25 +151,27 @@
         .chat-list-info h4 { margin: 0; font-size: 16px; color: var(--text-color, #e9edef); }
         .chat-list-info p { margin: 4px 0 0 0; font-size: 13px; color: #8696a0; }
 
-        /* বাটন ফোনের জন্য ডেডিকেটেড ওকে বাটন (থাম্বনেইলের উপরে বা নিচে সেট করা) */
+        /* বাটন ফোনের জন্য ডেডিকেটেড ও ফোকাসযোগ্য ওকে বাটন */
         .btn-ok-action {
             display: block;
             width: 100%;
             background-color: #005c4b;
             color: #fff;
             border: 2px solid #00ff66;
-            padding: 10px;
-            font-size: 15px;
+            padding: 12px;
+            font-size: 16px;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            margin-top: 6px;
+            margin-bottom: 8px;
             outline: none;
             text-align: center;
         }
         .btn-ok-action:focus, .btn-ok-action:hover {
             background-color: #00a884;
             color: #000;
+            border-color: #fff;
+            box-shadow: 0 0 12px #00ff66;
         }
 
         .chat-header {
@@ -349,7 +350,6 @@
     <div id="virtualCursor"></div>
 
     <div class="phone-frame" id="phoneBox">
-        <!-- চ্যাট লিস্ট স্ক্রিন -->
         <div id="imoListScreen" class="screen">
             <div class="whatsapp-top-nav">
                 <span>WhatsApp</span>
@@ -363,10 +363,8 @@
             </div>
             
             <div class="chat-list" id="chatListContainer">
-                <!-- থাম্বনেইল এবং ডেডিকেটেড ওকে বাটন বক্স -->
                 <div class="chat-card-box">
-                    <!-- বাটন ফোনের জন্য থাম্বনেইলের ঠিক ওপরে/কাছাকাছি স্পষ্ট ওকে বাটন -->
-                    <button class="btn-ok-action" onclick="openChatScreen()" tabindex="0">OK [চ্যাট ওপেন করুন]</button>
+                    <button id="okChatBtn" class="btn-ok-action" onclick="openChatScreen()" tabindex="0">OK [চ্যাট খুলুন]</button>
                     
                     <div class="chat-list-item" onclick="openChatScreen()">
                         <div class="chat-list-left">
@@ -384,7 +382,6 @@
             <div class="info-bar" id="deviceIdBar">স্ট্যাটাস: ডিসকানেক্টেড</div>
         </div>
 
-        <!-- চ্যাট রুম স্ক্রিন -->
         <div id="chatRoomScreen" class="screen hidden">
             <div class="chat-header">
                 <div class="chat-header-left">
@@ -439,7 +436,6 @@
             </div>
         </div>
 
-        <!-- ভিডিও কল স্ক্রিন -->
         <div id="videoCallScreen" class="screen video-call-screen hidden">
             <div class="call-top-info">
                 <h3 id="videoCallPartnerName">চ্যাট পার্টনার</h3>
@@ -457,7 +453,6 @@
             </div>
         </div>
 
-        <!-- অডিও কল স্ক্রিন -->
         <div id="audioCallScreen" class="screen audio-call-screen hidden">
             <div class="call-top-info" style="width: 100%;">
                 <h3 id="audioCallPartnerName">চ্যাট পার্টনার</h3>
@@ -545,6 +540,7 @@
         let zeroPressTimer = null;
         let zeroPressCount = 0;
 
+        // বাটন ফোনের জন্য সরাসরি কিবোর্ড নেভিগেশন ও ওকে বাটন ট্রিগার আপডেট
         document.addEventListener('keydown', (e) => {
             initAudioContext();
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', '0', '*'].includes(e.key)) {
@@ -574,6 +570,14 @@
                 }
             }
             else if (e.key === 'Enter' || e.key === ' ') {
+                // যদি ফোকাস সরাসরি ওকে বাটনে থাকে, তবে সরাসরি ওপেন করবে
+                const activeEl = document.activeElement;
+                if (activeEl && activeEl.id === 'okChatBtn') {
+                    openChatScreen();
+                    e.preventDefault();
+                    return;
+                }
+
                 cursor.style.display = 'none';
                 let targetEl = document.elementFromPoint(cursorX, cursorY);
                 cursor.style.display = 'block';
@@ -587,7 +591,7 @@
                     try { clickableItem.focus(); } catch(err) {}
                     try { clickableItem.click(); } catch(err) {}
 
-                    if (clickableItem.classList.contains('chat-list-item') || clickableItem.classList.contains('btn-ok-action')) {
+                    if (clickableItem.classList.contains('chat-list-item') || clickableItem.classList.contains('btn-ok-action') || clickableItem.id === 'okChatBtn') {
                         try { openChatScreen(); } catch(err) {}
                     }
                 }
