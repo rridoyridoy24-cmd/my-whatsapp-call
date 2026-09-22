@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Call App</title>
+    <title>Keypad Direct Call</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -36,58 +36,27 @@
             padding: 12px 15px; background: #1f2c34; color: #fff; font-size: 15px; font-weight: bold;
         }
 
+        /* কিবোর্ড দিয়ে ফোকাস হলে বর্ডার ও ব্যাকগ্রাউন্ড উজ্জ্বল হবে */
         .id-select {
-            background: #2a3942; color: #00ff66; border: 1px solid #00ff66;
-            padding: 5px 8px; border-radius: 6px; font-size: 13px; outline: none;
+            background: #2a3942; color: #00ff66; border: 2px solid #00ff66;
+            padding: 6px 12px; border-radius: 6px; font-size: 14px; outline: none; cursor: pointer;
         }
+        .id-select:focus { background: #005c4b; color: #fff; outline: 3px solid #fff; }
 
-        .main-content {
+        .main-box {
             flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px; background: #111b21; text-align: center; gap: 20px;
+            background: #111b21; gap: 20px; padding: 20px; text-align: center;
         }
 
-        /* একদম সহজ কল করুন বাটন যা কিবোর্ড দিয়ে সিলেক্ট করা যাবে */
-        .call-btn-main {
+        /* কল করার বাটন - কিবোর্ড ফোকাস সাপোর্ট */
+        .call-action-btn {
             background: #005c4b; color: #fff; border: 2px solid #00ff66;
-            padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 10px;
-            cursor: pointer; width: 80%;
+            padding: 18px 35px; font-size: 20px; font-weight: bold; border-radius: 12px;
+            cursor: pointer; width: 85%;
         }
-        .call-btn-main:focus, .call-btn-main:hover {
-            background: #007e66; outline: 3px solid #fff;
+        .call-action-btn:focus, .call-action-btn:hover {
+            background: #007e66; outline: 4px solid #fff; transform: scale(1.02);
         }
-
-        .chat-header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 15px; background: #1f2c34; border-bottom: 1px solid rgba(0,255,102,0.3);
-        }
-
-        .action-btn {
-            background: #005c4b; color: #fff; border: none; padding: 6px 12px;
-            border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer;
-        }
-        .action-btn:focus, .action-btn:hover { outline: 2px solid #fff; background: #007e66; }
-
-        .chat-body {
-            flex: 1; padding: 15px; overflow-y: auto;
-            display: flex; flex-direction: column; gap: 10px; background: #0b141a;
-        }
-
-        .bubble {
-            background: #202c33; padding: 10px 14px; border-radius: 10px;
-            max-width: 75%; align-self: flex-start; color: #e9edef; font-size: 14px; word-break: break-word;
-        }
-        .bubble.sent { background: #005c4b; align-self: flex-end; color: #fff; }
-
-        .chat-footer {
-            display: flex; align-items: center; gap: 6px; padding: 10px; background: #1f2c34;
-        }
-        .chat-footer input {
-            flex: 1; background: #2a3942; border: none; border-radius: 8px;
-            padding: 10px; color: #fff; outline: none; font-size: 14px;
-        }
-        .chat-footer input:focus { outline: 2px solid #00ff66; }
-
-        .send-btn { background: #005c4b; border: none; color: #fff; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
 
         .call-screen {
             display: flex; flex-direction: column; justify-content: space-between;
@@ -99,10 +68,10 @@
 
         .call-controls { 
             position: relative; z-index: 6; display: flex; gap: 15px; margin-bottom: 25px; 
-            background: rgba(0,0,0,0.6); padding: 10px; border-radius: 20px;
+            background: rgba(0,0,0,0.7); padding: 12px; border-radius: 20px;
         }
-        .ctrl-btn { background: #fff; border: none; padding: 12px 22px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 14px; }
-        .ctrl-btn:focus { outline: 3px solid #00ff66; }
+        .ctrl-btn { background: #fff; border: none; padding: 12px 25px; border-radius: 30px; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .ctrl-btn:focus { outline: 3px solid #00ff66; transform: scale(1.05); }
         .ctrl-btn.accept { background: #28a745; color: #fff; display: inline-block; }
         .ctrl-btn.hangup { background: #dc3545; color: #fff; }
     </style>
@@ -110,23 +79,25 @@
 <body>
 
     <div class="phone-frame">
-        <!-- ১. হোম স্ক্রিন (শুধু কল করুন বাটন) -->
+        <!-- হোম স্ক্রিন -->
         <div id="listScreen" class="screen">
             <div class="top-nav">
-                <span>Simple Call</span>
-                <select id="userSelect" class="id-select" onchange="changeUser()">
+                <span>Direct Call</span>
+                <!-- আইডি ড্রপডাউন -->
+                <select id="userSelect" class="id-select" tabindex="1" onchange="changeUser()">
                     <option value="id1">আইডি ১ (হৃদয়)</option>
                     <option value="id2">আইডি ২ (রূপসী)</option>
                 </select>
             </div>
-            <div class="main-content">
+            
+            <div class="main-box">
                 <p id="statusText" style="color: #8696a0; margin: 0; font-size: 14px;">স্ট্যাটাস: অনলাইন</p>
-                <!-- সরাসরি কল করার বাটন -->
-                <button class="call-btn-main" id="callMainBtn" tabindex="0" onclick="startCall()">📞 কল করুন</button>
+                <!-- কল করুন বাটন (কিবোর্ড ফোকাস টেস্টিংয়ের জন্য tabindex="2") -->
+                <button class="call-action-btn" id="callBtn" tabindex="2" onclick="startCall()">📞 কল করুন</button>
             </div>
         </div>
 
-        <!-- ২. কল স্ক্রিন -->
+        <!-- কল স্ক্রিন -->
         <div id="callScreen" class="screen call-screen hidden">
             <div style="z-index: 3; background: rgba(0,0,0,0.7); padding: 12px; border-radius: 10px; width: 100%;">
                 <h3 id="callTitle" style="margin:0; color:#fff;">কল চলছে...</h3>
@@ -135,8 +106,8 @@
             <video id="localVideo" autoplay playsinline muted></video>
             
             <div class="call-controls">
-                <button class="ctrl-btn accept" id="answerBtn" tabindex="0" onclick="answerCall()" style="display: none;">রিসিভ করুন</button>
-                <button class="ctrl-btn hangup" tabindex="0" onclick="endCall()">কেটে দিন</button>
+                <button class="ctrl-btn accept" id="answerBtn" tabindex="1" onclick="answerCall()" style="display: none;">রিসিভ করুন</button>
+                <button class="ctrl-btn hangup" id="hangupBtn" tabindex="2" onclick="endCall()">কেটে দিন</button>
             </div>
         </div>
     </div>
@@ -159,9 +130,10 @@
             initPeer();
         }
 
+        // পেজ লোড হওয়ার সাথে সাথে ড্রপডাউনে ফোকাস থাকবে, যেন কিবোর্ডের অ্যারো দিয়ে নিচে নামা যায়
         window.onload = () => { 
             changeUser(); 
-            document.getElementById('callMainBtn').focus();
+            document.getElementById('userSelect').focus();
         };
 
         function initPeer() {
@@ -176,6 +148,7 @@
                 document.getElementById('callScreen').classList.remove('hidden');
                 document.getElementById('callTitle').innerText = "📞 কল এসেছে...";
                 document.getElementById('answerBtn').style.display = 'inline-block';
+                // কল আসলে রিসিভ বাটনে অটো ফোকাস হবে যাতে কিবোর্ডের এন্টার প্রেস করলেই রিসিভ হয়ে যায়
                 document.getElementById('answerBtn').focus();
             });
         }
@@ -184,6 +157,7 @@
             document.getElementById('callScreen').classList.remove('hidden');
             document.getElementById('callTitle').innerText = "কলিং হচ্ছে...";
             document.getElementById('answerBtn').style.display = 'none';
+            document.getElementById('hangupBtn').focus(); // কল করার পর কেটে দিন বাটনে ফোকাস রাখব
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -200,6 +174,7 @@
         async function answerCall() {
             document.getElementById('answerBtn').style.display = 'none';
             document.getElementById('callTitle').innerText = "কথা চলছে...";
+            document.getElementById('hangupBtn').focus();
 
             try {
                 localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
@@ -227,7 +202,7 @@
             if (localStream) localStream.getTracks().forEach(t => t.stop());
 
             document.getElementById('callScreen').classList.add('hidden');
-            document.getElementById('callMainBtn').focus();
+            document.getElementById('userSelect').focus(); // কল কাটলে আবার আগের জায়গায় ফোকাস চলে আসবে
         }
     </script>
 </body>
