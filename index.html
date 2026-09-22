@@ -20,7 +20,6 @@
             overflow: hidden;
         }
 
-        /* থিম ভ্যারিয়েবল */
         body.dark-theme {
             --bg-main: #121212;
             --nav-bg: #1f2c34;
@@ -112,17 +111,29 @@
             flex: 1;
             overflow-y: auto;
             background: var(--list-bg, #111b21);
+            padding: 10px;
+        }
+
+        /* থাম্বনেইল এবং ওকে বাটন এর বক্স */
+        .chat-card-box {
+            background: rgba(255, 255, 255, 0.03);
+            border: 2px solid #2a3942;
+            border-radius: 12px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .chat-card-box:focus-within {
+            border-color: #00ff66;
+            box-shadow: 0 0 10px rgba(0,255,102,0.4);
         }
 
         .chat-list-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding: 8px;
             cursor: pointer;
         }
-        .chat-list-item:hover, .chat-list-item.focused { background: rgba(0,255,102,0.2); }
 
         .chat-list-left {
             display: flex;
@@ -135,10 +146,32 @@
             height: 50px;
             border-radius: 50%;
             object-fit: cover;
+            border: 2px solid #00ff66;
         }
 
         .chat-list-info h4 { margin: 0; font-size: 16px; color: var(--text-color, #e9edef); }
         .chat-list-info p { margin: 4px 0 0 0; font-size: 13px; color: #8696a0; }
+
+        /* বাটন ফোনের জন্য ডেডিকেটেড ওকে বাটন (থাম্বনেইলের উপরে বা নিচে সেট করা) */
+        .btn-ok-action {
+            display: block;
+            width: 100%;
+            background-color: #005c4b;
+            color: #fff;
+            border: 2px solid #00ff66;
+            padding: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 6px;
+            outline: none;
+            text-align: center;
+        }
+        .btn-ok-action:focus, .btn-ok-action:hover {
+            background-color: #00a884;
+            color: #000;
+        }
 
         .chat-header {
             display: flex;
@@ -182,7 +215,7 @@
             border-radius: 50%;
         }
         .header-icon-btn svg { width: 20px; height: 20px; fill: #aebac1; }
-        .header-icon-btn:hover, .header-icon-btn.focused { background: rgba(0,255,102,0.3); }
+        .header-icon-btn:hover { background: rgba(0,255,102,0.3); }
         .header-icon-btn:hover svg { fill: #fff; }
 
         .chat-body {
@@ -274,16 +307,8 @@
         #remoteVideo { width: 100%; height: 100%; object-fit: cover; }
         
         #localVideo {
-            position: absolute;
-            bottom: 80px;
-            right: 20px;
-            width: 90px;
-            height: 130px;
-            object-fit: cover;
-            border: 2px solid #00ff66;
-            border-radius: 10px;
-            z-index: 5;
-            background: #222;
+            position: absolute; bottom: 80px; right: 20px; width: 90px; height: 130px;
+            object-fit: cover; border: 2px solid #00ff66; border-radius: 10px; z-index: 5; background: #222;
         }
 
         .call-controls-bar {
@@ -310,15 +335,13 @@
         }
 
         .info-bar {
-            background: var(--nav-bg, #1f2c34); padding: 6px; font-size: 11px; color: #8696a0; text-align: center; display: flex; justify-content: space-around; align-items: center;
+            background: var(--nav-bg, #1f2c34); padding: 6px; font-size: 11px; color: #8696a0; text-align: center;
         }
 
         .progress-container {
             width: 100%; background: rgba(255,255,255,0.2); border-radius: 4px; height: 6px; margin-top: 5px; overflow: hidden;
         }
-        .progress-bar {
-            width: 0%; height: 100%; background: #00ff66; transition: width 0.2s;
-        }
+        .progress-bar { width: 0%; height: 100%; background: #00ff66; transition: width 0.2s; }
     </style>
 </head>
 <body class="dark-theme">
@@ -338,18 +361,26 @@
                 </div>
                 <button class="header-icon-btn" onclick="toggleTheme()" title="Toggle Theme">🌓</button>
             </div>
+            
             <div class="chat-list" id="chatListContainer">
-                <div class="chat-list-item" onclick="openChatScreen()" tabindex="0">
-                    <div class="chat-list-left">
-                        <img src="https://i.ibb.co.com/gMGsJmZS/Screenshot-20260903-224009-com-imo-android-imoimhd-Full-Screen-Profile-Activity-1.jpg" class="chat-list-avatar" alt="Avatar">
-                        <div class="chat-list-info">
-                            <h4 id="chatPartnerName">চ্যাট পার্টনার</h4>
-                            <p id="typingIndicatorPreview">টাচ ও বাটন ফোন সাপোর্ট</p>
+                <!-- থাম্বনেইল এবং ডেডিকেটেড ওকে বাটন বক্স -->
+                <div class="chat-card-box">
+                    <!-- বাটন ফোনের জন্য থাম্বনেইলের ঠিক ওপরে/কাছাকাছি স্পষ্ট ওকে বাটন -->
+                    <button class="btn-ok-action" onclick="openChatScreen()" tabindex="0">OK [চ্যাট ওপেন করুন]</button>
+                    
+                    <div class="chat-list-item" onclick="openChatScreen()">
+                        <div class="chat-list-left">
+                            <img src="https://i.ibb.co.com/gMGsJmZS/Screenshot-20260903-224009-com-imo-android-imoimhd-Full-Screen-Profile-Activity-1.jpg" class="chat-list-avatar" alt="Avatar">
+                            <div class="chat-list-info">
+                                <h4 id="chatPartnerName">চ্যাট পার্টনার</h4>
+                                <p id="typingIndicatorPreview">টাচ ও বাটন ফোন সাপোর্ট</p>
+                            </div>
                         </div>
+                        <span style="font-size: 12px; color: #8696a0;" id="lastSeenText">Active</span>
                     </div>
-                    <span style="font-size: 12px; color: #8696a0;" id="lastSeenText">Active</span>
                 </div>
             </div>
+            
             <div class="info-bar" id="deviceIdBar">স্ট্যাটাস: ডিসকানেক্টেড</div>
         </div>
 
@@ -421,13 +452,13 @@
             <div class="call-controls-bar">
                 <button class="call-ctrl-btn" id="vidMuteBtn" onclick="toggleMute()"><svg viewBox="0 0 24 24"><path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/><path d="M17 11c0 2.76-2.24 5-5 5s-5-2.24-5-5H5c0 3.53 2.61 6.43 6 6.92V21h2v-3.08c3.39-.49 6-3.39 6-6.92h-2z"/></svg></button>
                 <button class="call-ctrl-btn" onclick="toggleVideo()"><svg viewBox="0 0 24 24"><path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/></svg></button>
-                <button class="call-ctrl-btn" onclick="switchCamera()"><svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0-2-.9-2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5 z"/></svg></button>
+                <button class="call-ctrl-btn" onclick="switchCamera()"><svg viewBox="0 0 24 24"><path d="M20 4h-3.17L15 2H9L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0-2-.9-2-2V6c0-1.1-.9-2-2-2zm-8 13c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg></button>
                 <button class="call-ctrl-btn btn-hangup" onclick="endCall()"><svg viewBox="0 0 24 24"><path d="M12 9c-1.6 0-3.15.25-4.6.72v3.1c0 .39-.23.74-.56.9-.98.49-1.87 1.12-2.66 1.85-.18.18-.43.28-.7.28-.28 0-.53-.11-.71-.29L.29 13.08c-.18-.17-.29-.42-.29-.7 0-.28.11-.53.29-.71C3.34 8.78 7.46 7 12 7s8.66 1.78 11.71 4.67c.18.18.29.43.29.71 0 .28-.11.53-.29.71l-2.48 2.48c-.18.18-.43.29-.71.29-.27 0-.52-.11-.7-.28-.79-.73-1.68-1.36-2.66-1.85-.33-.16-.56-.51-.56-.9v-3.1C15.15 9.25 13.6 9 12 9z"/></svg></button>
             </div>
         </div>
 
         <!-- অডিও কল স্ক্রিন -->
-        <div id="audioCallScreen" class="screen whatsapp-bg audio-call-screen hidden">
+        <div id="audioCallScreen" class="screen audio-call-screen hidden">
             <div class="call-top-info" style="width: 100%;">
                 <h3 id="audioCallPartnerName">চ্যাট পার্টনার</h3>
                 <div id="audioCallStatus" class="call-status-text">Ringing ...</div>
@@ -516,19 +547,6 @@
 
         document.addEventListener('keydown', (e) => {
             initAudioContext();
-
-            // বাটন ফোনের কল বাটন বা এর সম্ভাব্য কী-কোড প্রেস করলেই সরাসরি চ্যাট রুমে চলে যাবে
-            if (e.key === 'Call' || e.code === 'F4' || e.key === 'c' || e.key === 'C' || e.key === 'F3' || e.keyCode === 115) {
-                const imoList = document.getElementById('imoListScreen');
-                if (imoList && !imoList.classList.contains('hidden')) {
-                    try {
-                        openChatScreen();
-                    } catch(err) {}
-                    e.preventDefault();
-                    return;
-                }
-            }
-
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', '0', '*'].includes(e.key)) {
                 if (!isButtonPhoneMode) {
                     isButtonPhoneMode = true;
@@ -565,11 +583,11 @@
                 }
 
                 if (targetEl && targetEl !== document.body) {
-                    const clickableItem = targetEl.closest('.chat-list-item, button, input, select, label, a') || targetEl;
+                    const clickableItem = targetEl.closest('.chat-list-item, .btn-ok-action, button, input, select, label, a') || targetEl;
                     try { clickableItem.focus(); } catch(err) {}
                     try { clickableItem.click(); } catch(err) {}
 
-                    if (clickableItem.classList.contains('chat-list-item') || clickableItem.closest('.chat-list-item')) {
+                    if (clickableItem.classList.contains('chat-list-item') || clickableItem.classList.contains('btn-ok-action')) {
                         try { openChatScreen(); } catch(err) {}
                     }
                 }
@@ -607,9 +625,7 @@
                 if(document.getElementById('videoCallPartnerName')) document.getElementById('videoCallPartnerName').innerText = "হৃদয় 💙";
                 if(document.getElementById('audioCallPartnerName')) document.getElementById('audioCallPartnerName').innerText = "হৃদয় 💙";
             }
-            if (peer) {
-                peer.destroy();
-            }
+            if (peer) { peer.destroy(); }
             initPeer();
         }
 
@@ -974,6 +990,7 @@
         }
 
         async function startCall(type) {
+            initAudioContext();
             document.getElementById('imoListScreen').classList.add('hidden');
             document.getElementById('chatRoomScreen').classList.add('hidden');
             startRingingTone();
@@ -1009,6 +1026,7 @@
         }
 
         async function answerIncomingCall() {
+            initAudioContext();
             stopRingingTone();
             if (!incomingCallObj) return;
             try {
