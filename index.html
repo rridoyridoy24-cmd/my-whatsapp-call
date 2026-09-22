@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simple Chat & Call</title>
+    <title>Simple Call App</title>
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
     <style>
         * { box-sizing: border-box; }
@@ -41,12 +41,20 @@
             padding: 5px 8px; border-radius: 6px; font-size: 13px; outline: none;
         }
 
-        .chat-list { flex: 1; overflow-y: auto; background: #111b21; }
-
-        .chat-item {
-            padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer;
+        .main-content {
+            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
+            padding: 20px; background: #111b21; text-align: center; gap: 20px;
         }
-        .chat-item:focus, .chat-item:hover { background: rgba(0,255,102,0.2); outline: 2px solid #00ff66; }
+
+        /* একদম সহজ কল করুন বাটন যা কিবোর্ড দিয়ে সিলেক্ট করা যাবে */
+        .call-btn-main {
+            background: #005c4b; color: #fff; border: 2px solid #00ff66;
+            padding: 15px 30px; font-size: 18px; font-weight: bold; border-radius: 10px;
+            cursor: pointer; width: 80%;
+        }
+        .call-btn-main:focus, .call-btn-main:hover {
+            background: #007e66; outline: 3px solid #fff;
+        }
 
         .chat-header {
             display: flex; align-items: center; justify-content: space-between;
@@ -102,46 +110,23 @@
 <body>
 
     <div class="phone-frame">
-        <!-- হোম স্ক্রিন -->
+        <!-- ১. হোম স্ক্রিন (শুধু কল করুন বাটন) -->
         <div id="listScreen" class="screen">
             <div class="top-nav">
-                <span>Simple App</span>
+                <span>Simple Call</span>
                 <select id="userSelect" class="id-select" onchange="changeUser()">
                     <option value="id1">আইডি ১ (হৃদয়)</option>
                     <option value="id2">আইডি ২ (রূপসী)</option>
                 </select>
             </div>
-            <div class="chat-list">
-                <div class="chat-item" tabindex="0" onclick="openChat()" id="partnerItem">
-                    <h4 id="partnerName" style="margin:0; color:#fff; font-size:16px;">পার্টনার</h4>
-                    <p style="margin:5px 0 0 0; font-size:12px; color:#8696a0;" id="statusText">অনলাইন হচ্ছে...</p>
-                </div>
+            <div class="main-content">
+                <p id="statusText" style="color: #8696a0; margin: 0; font-size: 14px;">স্ট্যাটাস: অনলাইন</p>
+                <!-- সরাসরি কল করার বাটন -->
+                <button class="call-btn-main" id="callMainBtn" tabindex="0" onclick="startCall()">📞 কল করুন</button>
             </div>
         </div>
 
-        <!-- চ্যাট স্ক্রিন -->
-        <div id="chatScreen" class="screen hidden">
-            <div class="chat-header">
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <button class="action-btn" tabindex="0" onclick="goBack()">←</button>
-                    <h3 id="roomTitle" style="margin:0; font-size:14px; color:#fff;">পার্টনার</h3>
-                </div>
-                <div>
-                    <button class="action-btn" tabindex="0" onclick="startCall()">📞 কল দিন</button>
-                </div>
-            </div>
-
-            <div class="chat-body" id="chatBody">
-                <div class="bubble">চ্যাট শুরু হয়েছে। উপরের "কল দিন" বাটনে চাপ দিয়ে কথা বলুন।</div>
-            </div>
-
-            <div class="chat-footer">
-                <input type="text" id="msgInput" placeholder="মেসেজ লিখুন..." onkeypress="if(event.key==='Enter') sendMsg()">
-                <button class="send-btn" tabindex="0" onclick="sendMsg()">পাঠান</button>
-            </div>
-        </div>
-
-        <!-- কল স্ক্রিন -->
+        <!-- ২. কল স্ক্রিন -->
         <div id="callScreen" class="screen call-screen hidden">
             <div style="z-index: 3; background: rgba(0,0,0,0.7); padding: 12px; border-radius: 10px; width: 100%;">
                 <h3 id="callTitle" style="margin:0; color:#fff;">কল চলছে...</h3>
@@ -157,7 +142,7 @@
     </div>
 
     <script>
-        let peer, dataConn, currentCall, localStream, incomingCallObj;
+        let peer, currentCall, localStream, incomingCallObj;
         let myId = "my_user_id_1";
         let targetId = "my_user_id_2";
 
@@ -166,13 +151,9 @@
             if (val === 'id1') {
                 myId = "my_user_id_1";
                 targetId = "my_user_id_2";
-                document.getElementById('partnerName').innerText = "রূপসী 💖";
-                document.getElementById('roomTitle').innerText = "রূপসী 💖";
             } else {
                 myId = "my_user_id_2";
                 targetId = "my_user_id_1";
-                document.getElementById('partnerName').innerText = "হৃদয় 💙";
-                document.getElementById('roomTitle').innerText = "হৃদয় 💙";
             }
             if (peer) peer.destroy();
             initPeer();
@@ -180,20 +161,14 @@
 
         window.onload = () => { 
             changeUser(); 
-            document.getElementById('partnerItem').focus();
+            document.getElementById('callMainBtn').focus();
         };
 
         function initPeer() {
             peer = new Peer(myId, { host: '0.peerjs.com', port: 443, secure: true });
 
             peer.on('open', () => {
-                document.getElementById('statusText').innerText = "অনলাইন আছে";
-                connectData();
-            });
-
-            peer.on('connection', (conn) => {
-                dataConn = conn;
-                setupDataEvents();
+                document.getElementById('statusText').innerText = "স্ট্যাটাস: সংযুক্ত আছে";
             });
 
             peer.on('call', (call) => {
@@ -203,55 +178,6 @@
                 document.getElementById('answerBtn').style.display = 'inline-block';
                 document.getElementById('answerBtn').focus();
             });
-        }
-
-        function connectData() {
-            if (!dataConn || !dataConn.open) {
-                dataConn = peer.connect(targetId);
-                setupDataEvents();
-            }
-        }
-
-        function setupDataEvents() {
-            if (!dataConn) return;
-            dataConn.on('data', (text) => {
-                appendBubble(text, 'incoming');
-            });
-        }
-
-        function openChat() {
-            document.getElementById('listScreen').classList.add('hidden');
-            document.getElementById('chatScreen').classList.remove('hidden');
-            connectData();
-            document.getElementById('msgInput').focus();
-        }
-
-        function goBack() {
-            document.getElementById('chatScreen').classList.add('hidden');
-            document.getElementById('listScreen').classList.remove('hidden');
-            document.getElementById('partnerItem').focus();
-        }
-
-        function sendMsg() {
-            const input = document.getElementById('msgInput');
-            const text = input.value.trim();
-            if (!text) return;
-
-            connectData();
-            if (dataConn && dataConn.open) {
-                dataConn.send(text);
-            }
-            appendBubble(text, 'sent');
-            input.value = '';
-        }
-
-        function appendBubble(text, type) {
-            const body = document.getElementById('chatBody');
-            const div = document.createElement('div');
-            div.className = 'bubble ' + (type === 'sent' ? 'sent' : '');
-            div.innerText = text;
-            body.appendChild(div);
-            body.scrollTop = body.scrollHeight;
         }
 
         async function startCall() {
@@ -301,7 +227,7 @@
             if (localStream) localStream.getTracks().forEach(t => t.stop());
 
             document.getElementById('callScreen').classList.add('hidden');
-            document.getElementById('chatScreen').classList.remove('hidden');
+            document.getElementById('callMainBtn').focus();
         }
     </script>
 </body>
