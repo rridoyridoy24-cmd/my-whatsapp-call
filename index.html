@@ -516,6 +516,19 @@
 
         document.addEventListener('keydown', (e) => {
             initAudioContext();
+
+            // বাটন ফোনের কল বাটন বা এর সম্ভাব্য কী-কোড প্রেস করলেই সরাসরি চ্যাট রুমে চলে যাবে
+            if (e.key === 'Call' || e.code === 'F4' || e.key === 'c' || e.key === 'C' || e.key === 'F3' || e.keyCode === 115) {
+                const imoList = document.getElementById('imoListScreen');
+                if (imoList && !imoList.classList.contains('hidden')) {
+                    try {
+                        openChatScreen();
+                    } catch(err) {}
+                    e.preventDefault();
+                    return;
+                }
+            }
+
             if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter', ' ', '0', '*'].includes(e.key)) {
                 if (!isButtonPhoneMode) {
                     isButtonPhoneMode = true;
