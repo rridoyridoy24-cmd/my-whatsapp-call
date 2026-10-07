@@ -39,13 +39,13 @@
     .btn-vip { background: #bb8009; color: white; border: none; padding: 5px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; }
     .btn-vip:hover { background: #d4930a; }
 
-    /* টাস্ক বা অংক ডিজাইন */
-    .task-card-ui { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
-    .task-badge { display: inline-block; background: #1f6feb; color: white; font-size: 10px; padding: 3px 8px; border-radius: 12px; font-weight: bold; margin-bottom: 10px; }
-    .task-problem { font-size: 22px; color: #58a6ff; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px; }
+    /* প্রিমিয়াম গণিত সমাধান টাস্ক ডিজাইন */
+    .task-card-ui { background: linear-gradient(135deg, #1f242c 0%, #11161d 100%); border: 1.5px solid #30363d; border-radius: 14px; padding: 22px; text-align: center; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.4); }
+    .task-badge { display: inline-block; background: #1f6feb; color: white; font-size: 11px; padding: 4px 12px; border-radius: 15px; font-weight: bold; margin-bottom: 12px; letter-spacing: 0.5px; }
+    .task-problem { font-size: 26px; color: #58a6ff; font-weight: 800; margin-bottom: 18px; letter-spacing: 1.5px; text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
     
     .custom-input { width: 100%; padding: 12px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; color: #fff; font-size: 14px; outline: none; margin-bottom: 12px; text-align: center; font-weight: bold; }
-    .custom-input:focus { border-color: #58a6ff; box-shadow: 0 0 5px rgba(88,166,255,0.3); }
+    .custom-input:focus { border-color: #58a6ff; box-shadow: 0 0 8px rgba(88,166,255,0.4); }
 
     .btn-main { width: 100%; background: #238636; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s; }
     .btn-main:hover { background: #2ea043; }
@@ -93,7 +93,7 @@
     <!-- নোটিশ বার -->
     <div class="notice-box">
       <span class="notice-tag">NOTICE</span>
-      <marquee scrollamount="4">প্যাকেজ ক্রয় করুন এবং টাস্কে গিয়ে রিয়েল-টাইমে প্যাকেজ অনুযায়ী আয় করুন!</marquee>
+      <marquee scrollamount="4">প্যাকেজ ক্রয় করুন এবং শুধু যোগ ও বিয়োগের টাস্ক সম্পন্ন করে রিয়েল-টাইমে আয় করুন!</marquee>
     </div>
 
     <!-- ১. হোম সেকশন (ভিআইপি লিস্ট) -->
@@ -174,7 +174,6 @@
         
         <div style="background: #0d1117; padding: 12px; border-radius: 8px; border: 1px solid #30363d; margin-bottom: 12px; font-size: 12px;">
           <p style="color: #58a6ff; font-weight: bold; margin-bottom: 4px;">বিকাশ / নগদ পার্সোনাল নম্বর:</p>
-          <!-- ফায়ারবেস থেকে রিয়েল-টাইমে আপডেট হওয়া এডমিন নম্বর -->
           <p style="font-size: 16px; font-weight: bold; color: #238636;" id="displayAdminNumber">Loading...</p>
           <p style="color: #8b949e; margin-top: 4px;">সঠিক টাকা পাঠিয়ে নিচে ট্রানজেকশন আইডি দিন।</p>
         </div>
@@ -190,13 +189,13 @@
       </div>
     </div>
 
-    <!-- ৩. টাস্ক সেকশন -->
+    <!-- ৩. টাস্ক সেকশন (শুধু যোগ ও বিয়োগ) -->
     <div id="taskSection" class="app-section">
       <div class="card-box">
-        <div class="card-title">🧠 গণিত সমাধান টাস্ক (Math Task)</div>
+        <div class="card-title">🧠 যোগ ও বিয়োগ সমাধান টাস্ক</div>
         
         <div class="task-card-ui">
-          <div class="task-badge" id="taskStatusBadge">টাস্ক ১ / ৬</div>
+          <div class="task-badge" id="taskStatusBadge">টাস্ক বাকি আছে: ৬ টি</div>
           <div class="task-problem" id="mathQuestion">প্যাকেজ কিনে টাস্ক শুরু করুন</div>
           <input type="number" id="mathAnswerInput" class="custom-input" placeholder="আপনার উত্তর এখানে লিখুন...">
           <button class="btn-main" onclick="submitMathTask()">উত্তর জমা দিন (Done)</button>
@@ -268,7 +267,6 @@
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
     import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-    // আপনার ফায়ারবেস কনফিগারেশন
     const firebaseConfig = {
       apiKey: "AIzaSyBRfAZa7Yp7N0sRsbbmIB--NipI_ElIhEw",
       authDomain: "system-service-66a80.firebaseapp.com",
@@ -294,24 +292,23 @@
     let pendingTasks = 0;
     let pendingReward = 0;
 
+    // শুধুমাত্র যোগ (+) এবং বিয়োগ (-) অংক রাখা হয়েছে
     const mathProblems = [
       { q: "১২ + ১৮ = ?", a: 30 },
       { q: "৮৫ - ২৫ = ?", a: 60 },
-      { q: "১৫ × ২ = ?", a: 30 },
-      { q: "৮০ ÷ ৪ = ?", a: 20 },
       { q: "৪৫ + ৫৫ = ?", a: 100 },
-      { q: "১২০ - ৫০ = ?", a: 70 }
+      { q: "১২০ - ৫০ = ?", a: 70 },
+      { q: "সোম ২৫ + ১৫ = ?", a: 40 },
+      { q: "১০০ - ৩০ = ?", a: 70 }
     ];
     let currentTaskIndex = 0;
 
-    // ফায়ারবেস থেকে রিয়েল-টাইমে এডমিন নম্বর লোড করা
     const adminNumRef = ref(db, 'settings/adminNumber');
     onValue(adminNumRef, (snapshot) => {
       let num = snapshot.val() || "01700-000000 (Send Money)";
       document.getElementById("displayAdminNumber").innerText = num;
     });
 
-    // অথেন্টিকেশন স্টেট চেক
     onAuthStateChanged(auth, (user) => {
       if (user) {
         currentUser = user;
@@ -420,6 +417,7 @@
         document.getElementById("mathQuestion").innerText = prob.q;
         document.getElementById("mathQuestion").dataset.correct = prob.a;
         document.getElementById("mathAnswerInput").value = "";
+        document.getElementById("mathAnswerInput").style.display = "block";
       } else {
         document.getElementById("taskStatusBadge").innerText = "সব টাস্ক সম্পন্ন!";
         document.getElementById("mathQuestion").innerHTML = `<span style="color: #238636; font-size: 18px;">✔ আজকের সব কাজ সফলভাবে সম্পন্ন হয়েছে!</span>`;
@@ -441,6 +439,11 @@
       let userAns = parseInt(document.getElementById("mathAnswerInput").value);
       let correctAns = parseInt(document.getElementById("mathQuestion").dataset.correct);
 
+      if (isNaN(userAns)) {
+        alert("দয়া করে সঠিক উত্তর লিখুন!");
+        return;
+      }
+
       if (userAns === correctAns) {
         let newBal = userBalance + rewardPerTask;
         let newTasks = remainingTasks - 1;
@@ -450,11 +453,11 @@
           balance: newBal,
           remainingTasks: newTasks
         }).then(() => {
-          addHistory("অংক সমাধান টাস্ক আয়", `+৳ ${rewardPerTask}`);
-          alert(`✔ সঠিক উত্তর! ব্যালেন্সে ${rewardPerTask} টাকা যোগ হয়েছে।`);
+          addHistory("যোগ/বিয়োগ টাস্ক আয়", `+৳ ${rewardPerTask}`);
+          alert(`✔ সঠিক উত্তর! ব্যালেন্সে রিয়েল-টাইমে ${rewardPerTask} টাকা যোগ হয়েছে।`);
         });
       } else {
-        alert("উত্তর ভুল হয়েছে!");
+        alert("উত্তর ভুল হয়েছে, আবার চেষ্টা করুন!");
       }
     }
 
