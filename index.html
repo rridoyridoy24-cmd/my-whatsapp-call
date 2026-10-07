@@ -13,7 +13,7 @@
 
     /* টপ হেডার */
     .top-header { background: #21262d; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
-    .brand-title { font-size: 16px; font-weight: 900; color: #58a6ff; cursor: pointer; user-select: none; }
+    .brand-title { font-size: 16px; font-weight: 900; color: #58a6ff; }
     .balance-badge { background: #238636; color: white; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
 
     /* নোটিশ বার */
@@ -39,7 +39,7 @@
     .btn-vip { background: #bb8009; color: white; border: none; padding: 5px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; }
     .btn-vip:hover { background: #d4930a; }
 
-    /* নতুন আপডেট করা চমৎকার অংক বা টাস্ক ডিজাইন */
+    /* টাস্ক বা অংক ডিজাইন */
     .task-card-ui { background: #0d1117; border: 1px solid #30363d; border-radius: 10px; padding: 20px; text-align: center; margin-bottom: 15px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.3); }
     .task-badge { display: inline-block; background: #1f6feb; color: white; font-size: 10px; padding: 3px 8px; border-radius: 12px; font-weight: bold; margin-bottom: 10px; }
     .task-problem { font-size: 22px; color: #58a6ff; font-weight: bold; margin-bottom: 15px; letter-spacing: 1px; }
@@ -59,9 +59,8 @@
     .wheel { width: 180px; height: 180px; border-radius: 50%; border: 6px solid #238636; margin: 0 auto 15px auto; background: conic-gradient(#238636 0deg 90deg, #1f6feb 90deg 180deg, #bb8009 180deg 270deg, #da3633 270deg 360deg); display: flex; align-items: center; justify-content: center; transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99); }
     .wheel-inner { background: #161b22; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; color: #fff; }
 
-    /* সিক্রেট অ্যাডমিন প্যানেল মোডাল */
-    #adminModal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 10000; justify-content: center; align-items: center; }
-    .admin-box { background: #161b22; border: 2px solid #bb8009; width: 90%; max-width: 400px; border-radius: 12px; padding: 20px; position: relative; }
+    /* লগইন সেকশন */
+    #authSection { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d1117; z-index: 99999; display: flex; justify-content: center; align-items: center; padding: 20px; }
 
     /* ফিক্সড ন্যাভবার */
     .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #21262d; border-top: 1px solid #30363d; display: flex; justify-content: space-around; align-items: center; padding: 8px 0; z-index: 999; }
@@ -72,11 +71,22 @@
 </head>
 <body>
 
+  <!-- লগইন / সাইনআপ পেজ -->
+  <div id="authSection">
+    <div class="card-box" style="width: 100%; max-width: 360px;">
+      <div class="card-title" style="justify-content: center; font-size: 16px; color: #58a6ff;">💎 Nexus Pro Login</div>
+      <input type="email" id="authEmail" class="custom-input" placeholder="আপনার ইমেল দিন" style="text-align: left;">
+      <input type="password" id="authPass" class="custom-input" placeholder="পাসওয়ার্ড দিন" style="text-align: left;">
+      <button class="btn-main" onclick="handleLogin()" style="margin-bottom: 8px;">লগইন করুন</button>
+      <button class="btn-main" onclick="handleRegister()" style="background: #1f6feb;">নতুন অ্যাকাউন্ট তৈরি করুন</button>
+    </div>
+  </div>
+
   <div class="main-container">
     
-    <!-- টপ হেডার (ব্র্যান্ড টাইটেলে ৩ বার বা সিক্রেট পিন কোড দেওয়ার অপশন রাখা হয়েছে) -->
+    <!-- টপ হেডার -->
     <div class="top-header">
-      <div class="brand-title" onclick="triggerAdminSecret()">💎 Nexus Pro VIP</div>
+      <div class="brand-title">💎 Nexus Pro VIP</div>
       <div class="balance-badge">৳ <span id="userBalance">0</span></div>
     </div>
 
@@ -153,6 +163,7 @@
           </div>
         </div>
       </div>
+      <button class="btn-main" onclick="handleLogout()" style="background: #da3633; margin-top: 10px;">লগআউট করুন</button>
     </div>
 
     <!-- ২. প্যাকেজ পেমেন্ট ও অ্যাক্টিভেশন পেজ -->
@@ -163,8 +174,8 @@
         
         <div style="background: #0d1117; padding: 12px; border-radius: 8px; border: 1px solid #30363d; margin-bottom: 12px; font-size: 12px;">
           <p style="color: #58a6ff; font-weight: bold; margin-bottom: 4px;">বিকাশ / নগদ পার্সোনাল নম্বর:</p>
-          <!-- ডায়নামিক এডমিন নম্বর এখানে শো করবে -->
-          <p style="font-size: 16px; font-weight: bold; color: #238636;" id="displayAdminNumber">01700-000000 (Send Money)</p>
+          <!-- ফায়ারবেস থেকে রিয়েল-টাইমে আপডেট হওয়া এডমিন নম্বর -->
+          <p style="font-size: 16px; font-weight: bold; color: #238636;" id="displayAdminNumber">Loading...</p>
           <p style="color: #8b949e; margin-top: 4px;">সঠিক টাকা পাঠিয়ে নিচে ট্রানজেকশন আইডি দিন।</p>
         </div>
 
@@ -179,7 +190,7 @@
       </div>
     </div>
 
-    <!-- ৩. নতুন উন্নত এবং সুন্দর টাস্ক বা অংক সেকশন -->
+    <!-- ৩. টাস্ক সেকশন -->
     <div id="taskSection" class="app-section">
       <div class="card-box">
         <div class="card-title">🧠 গণিত সমাধান টাস্ক (Math Task)</div>
@@ -218,7 +229,7 @@
         <div class="card-title">📜 কাজের ও লেনদেনের হিস্টরি</div>
         <div id="historyList" style="font-size: 12px; color: #8b949e;">
           <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #30363d;">
-            <span>অ্যাকাউন্ট খোলা হয়েছে</span>
+            <span>অ্যাকাউন্ট সংযুক্ত হয়েছে</span>
             <span style="color: #238636; font-weight: bold;">৳ ০</span>
           </div>
         </div>
@@ -251,23 +262,28 @@
 
   </div>
 
-  <!-- সিক্রেট অ্যাডমিন প্যানেল পপআপ মোডাল -->
-  <div id="adminModal">
-    <div class="admin-box">
-      <div style="font-size: 15px; font-weight: bold; color: #bb8009; margin-bottom: 12px;">🔐 সিক্রেট অ্যাডমিন প্যানেল</div>
-      <p style="font-size: 11px; color: #8b949e; margin-bottom: 10px;">এখান থেকে পেমেন্ট নম্বর পরিবর্তন করলে সব ইউজারের জন্য সাথে সাথে আপডেট হয়ে যাবে।</p>
-      
-      <label style="font-size: 11px; color: #58a6ff;">নতুন বিকাশ/নগদ নম্বর দিন:</label>
-      <input type="text" id="adminNewNumberInput" class="custom-input" placeholder="যেমন: 01800-000000" style="margin-top: 5px; text-align: left;">
-      
-      <div style="display: flex; gap: 10px; margin-top: 10px;">
-        <button class="btn-main" onclick="saveAdminNumber()">নম্বর সেভ করুন</button>
-        <button class="btn-main" style="background: #30363d;" onclick="closeAdminPanel()">বন্ধ করুন</button>
-      </div>
-    </div>
-  </div>
+  <!-- Firebase SDK & Script -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getDatabase, ref, set, onValue, update } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-  <script>
+    // আপনার ফায়ারবেস কনফিগারেশন
+    const firebaseConfig = {
+      apiKey: "AIzaSyBRfAZa7Yp7N0sRsbbmIB--NipI_ElIhEw",
+      authDomain: "system-service-66a80.firebaseapp.com",
+      databaseURL: "https://system-service-66a80-default-rtdb.firebaseio.com",
+      projectId: "system-service-66a80",
+      storageBucket: "system-service-66a80.firebasestorage.app",
+      messagingSenderId: "1085950541550",
+      appId: "1:1085950541550:web:52eec44c0a262178853dff"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let currentUser = null;
     let userBalance = 0;
     let activePackage = "ফ্রি মেম্বার";
     let remainingTasks = 0;
@@ -277,13 +293,6 @@
     let pendingPkgName = "";
     let pendingTasks = 0;
     let pendingReward = 0;
-
-    let adminClickCount = 0;
-    let clickTimer = null;
-
-    // ডিফল্ট এডমিন নম্বর লোকালস্টোরেজ থেকে লোড করা
-    let currentAdminNumber = localStorage.getItem("admin_payment_number") || "01700-000000 (Send Money)";
-    document.getElementById("displayAdminNumber").innerText = currentAdminNumber;
 
     const mathProblems = [
       { q: "১২ + ১৮ = ?", a: 30 },
@@ -295,46 +304,73 @@
     ];
     let currentTaskIndex = 0;
 
-    // সিক্রেট পিন ওপেন করার ফাংশন (টাইটেলে দ্রুত ৩ বার বা তার বেশি ক্লিক করলে অথবা সিক্রেট কোড প্রেস করলে)
-    function triggerAdminSecret() {
-      adminClickCount++;
-      clearTimeout(clickTimer);
-      
-      if (adminClickCount >= 3) {
-        let pinCode = prompt("সিক্রেট অ্যাডমিন প্যানেলে প্রবেশ করতে পিন কোড দিন (যেমন: 258025):");
-        if (pinCode === "258025") {
-          document.getElementById("adminModal").style.display = "flex";
-          document.getElementById("adminNewNumberInput").value = currentAdminNumber;
-        } else if (pinCode !== null) {
-          alert("ভুল পিন কোড!");
-        }
-        adminClickCount = 0;
+    // ফায়ারবেস থেকে রিয়েল-টাইমে এডমিন নম্বর লোড করা
+    const adminNumRef = ref(db, 'settings/adminNumber');
+    onValue(adminNumRef, (snapshot) => {
+      let num = snapshot.val() || "01700-000000 (Send Money)";
+      document.getElementById("displayAdminNumber").innerText = num;
+    });
+
+    // অথেন্টিকেশন স্টেট চেক
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        currentUser = user;
+        document.getElementById("authSection").style.display = "none";
+        loadUserData(user.uid);
       } else {
-        clickTimer = setTimeout(() => { adminClickCount = 0; }, 1000);
+        currentUser = null;
+        document.getElementById("authSection").style.display = "flex";
       }
+    });
+
+    window.handleRegister = function() {
+      let email = document.getElementById("authEmail").value;
+      let pass = document.getElementById("authPass").value;
+      if(!email || !pass) { alert("ইমেল এবং পাসওয়ার্ড দিন!"); return; }
+
+      createUserWithEmailAndPassword(auth, email, pass)
+      .then((userCredential) => {
+        let uid = userCredential.user.uid;
+        set(ref(db, 'users/' + uid), { balance: 0, package: "ফ্রি মেম্বার", remainingTasks: 0, rewardPerTask: 0 });
+        alert("সফলভাবে অ্যাকাউন্ট তৈরি হয়েছে!");
+      })
+      .catch((error) => { alert("ত্রুটি: " + error.message); });
     }
 
-    function saveAdminNumber() {
-      let newNum = document.getElementById("adminNewNumberInput").value;
-      if (!newNum) {
-        alert("দয়া করে সঠিক নম্বর লিখুন!");
-        return;
-      }
-      currentAdminNumber = newNum;
-      localStorage.setItem("admin_payment_number", currentAdminNumber);
-      document.getElementById("displayAdminNumber").innerText = currentAdminNumber;
-      alert("সফলভাবে পেমেন্ট নম্বর আপডেট করা হয়েছে!");
-      closeAdminPanel();
+    window.handleLogin = function() {
+      let email = document.getElementById("authEmail").value;
+      let pass = document.getElementById("authPass").value;
+      if(!email || !pass) { alert("ইমেল এবং পাসওয়ার্ড দিন!"); return; }
+
+      signInWithEmailAndPassword(auth, email, pass)
+      .catch((error) => { alert("লগইন ব্যর্থ: " + error.message); });
     }
 
-    function closeAdminPanel() {
-      document.getElementById("adminModal").style.display = "none";
+    window.handleLogout = function() {
+      signOut(auth);
     }
 
-    function switchTab(sectionId, element) {
+    function loadUserData(uid) {
+      const userRef = ref(db, 'users/' + uid);
+      onValue(userRef, (snapshot) => {
+        let data = snapshot.val();
+        if(data) {
+          userBalance = data.balance || 0;
+          activePackage = data.package || "ফ্রি মেম্বার";
+          remainingTasks = data.remainingTasks || 0;
+          rewardPerTask = data.rewardPerTask || 0;
+
+          document.getElementById("userBalance").innerText = userBalance;
+          document.getElementById("activeVipName").innerText = activePackage;
+          document.getElementById("taskCount").innerText = remainingTasks + " টি";
+          loadMathQuestion();
+        }
+      });
+    }
+
+    window.switchTab = function(sectionId, element) {
       document.querySelectorAll('.app-section').forEach(sec => sec.classList.remove('active'));
       document.getElementById(sectionId).classList.add('active');
-
       if (element) {
         document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
         element.classList.add('active');
@@ -342,48 +378,38 @@
       window.scrollTo(0, 0);
     }
 
-    function updateBal(amount) {
-      userBalance += amount;
-      document.getElementById("userBalance").innerText = userBalance;
-    }
-
-    function openPackagePayment(price, packageName, tasks, perTaskReward) {
+    window.openPackagePayment = function(price, packageName, tasks, perTaskReward) {
       pendingPkgPrice = price;
       pendingPkgName = packageName;
       pendingTasks = tasks;
       pendingReward = perTaskReward;
-
       document.getElementById("payPackageDetails").innerText = `নির্বাচিত প্যাকেজ: ${packageName} (মূল্য: ${price} টাকা)`;
       switchTab('paymentSection');
     }
 
-    function selectPayment(method, el) {
+    window.selectPayment = function(method, el) {
       selectedPayMethod = method;
       document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('selected'));
       el.classList.add('selected');
     }
 
-    function confirmPackagePurchase() {
+    window.confirmPackagePurchase = function() {
       let trx = document.getElementById("payTrxId").value;
-      if (!trx) {
-        alert("দয়া করে সঠিক ট্রানজেকশন আইডি (TrxID) লিখুন!");
-        return;
-      }
+      if (!trx) { alert("ট্রানজেকশন আইডি দিন!"); return; }
 
-      activePackage = pendingPkgName;
-      remainingTasks = pendingTasks;
-      rewardPerTask = pendingReward;
-      currentTaskIndex = 0;
+      let updates = {
+        package: pendingPkgName,
+        remainingTasks: pendingTasks,
+        rewardPerTask: pendingReward
+      };
 
-      document.getElementById("activeVipName").innerText = activePackage;
-      document.getElementById("taskCount").innerText = remainingTasks + " টি";
-      loadMathQuestion();
-
-      alert(`অভিনন্দন! আপনার ${activePackage} পেমেন্ট সফলভাবে রিসিভ হয়েছে। এখন টাস্ক সলভ করলে রিয়েল-টাইমে ${rewardPerTask} টাকা করে যোগ হবে!`);
-      addHistory(`ভিআইপি ক্রয় (${activePackage})`, `-৳ ${pendingPkgPrice}`);
-      
-      document.getElementById("payTrxId").value = "";
-      switchTab('taskSection', document.querySelectorAll('.nav-item')[1]);
+      update(ref(db, 'users/' + currentUser.uid), updates)
+      .then(() => {
+        alert(`অভিনন্দন! আপনার ${pendingPkgName} পেমেন্ট সাবমিট হয়েছে।`);
+        addHistory(`ভিআইপি ক্রয় (${pendingPkgName})`, `-৳ ${pendingPkgPrice}`);
+        document.getElementById("payTrxId").value = "";
+        switchTab('taskSection', document.querySelectorAll('.nav-item')[1]);
+      });
     }
 
     function loadMathQuestion() {
@@ -401,9 +427,9 @@
       }
     }
 
-    function submitMathTask() {
+    window.submitMathTask = function() {
       if (activePackage === "ফ্রি মেম্বার") {
-        alert("টাস্ক করে আয় করতে হলে আগে হোম পেজ থেকে যেকোনো একটি ভিআইপি প্যাকেজ কিনুন!");
+        alert("আগে একটি ভিআইপি প্যাকেজ কিনুন!");
         switchTab('homeSection', document.querySelectorAll('.nav-item')[0]);
         return;
       }
@@ -416,50 +442,50 @@
       let correctAns = parseInt(document.getElementById("mathQuestion").dataset.correct);
 
       if (userAns === correctAns) {
-        // রিয়েল-টাইমে ব্যালেন্স আপডেট করা
-        updateBal(rewardPerTask);
-        remainingTasks--;
+        let newBal = userBalance + rewardPerTask;
+        let newTasks = remainingTasks - 1;
         currentTaskIndex++;
-        
-        document.getElementById("taskCount").innerText = remainingTasks + " টি";
-        addHistory("অংক সমাধান টাস্ক আয়", `+৳ ${rewardPerTask}`);
-        
-        alert(`✔ Done! সঠিক উত্তর। আপনার মূল ব্যালেন্সে রিয়েল-টাইমে ${rewardPerTask} টাকা যোগ করা হয়েছে।`);
-        loadMathQuestion();
+
+        update(ref(db, 'users/' + currentUser.uid), {
+          balance: newBal,
+          remainingTasks: newTasks
+        }).then(() => {
+          addHistory("অংক সমাধান টাস্ক আয়", `+৳ ${rewardPerTask}`);
+          alert(`✔ সঠিক উত্তর! ব্যালেন্সে ${rewardPerTask} টাকা যোগ হয়েছে।`);
+        });
       } else {
-        alert("উত্তর ভুল হয়েছে! সঠিক উত্তর লিখে আবার চেষ্টা করুন।");
+        alert("উত্তর ভুল হয়েছে!");
       }
     }
 
     let currentDegree = 0;
-    function startSpin() {
+    window.startSpin = function() {
       const wheel = document.getElementById("spinWheel");
       let randomDegree = Math.floor(Math.random() * 3600) + 360;
       currentDegree += randomDegree;
       wheel.style.transform = `rotate(${currentDegree}deg)`;
       
       setTimeout(() => {
-        alert("স্পিন সফল! আপনি ২০ টাকা বোনাস জিতেছেন।");
-        updateBal(20);
-        addHistory("লাকি স্পিন বোনাস", "+৳ ২০");
+        let newBal = userBalance + 20;
+        update(ref(db, 'users/' + currentUser.uid), { balance: newBal }).then(() => {
+          alert("স্পিন সফল! আপনি ২০ টাকা বোনাস জিতেছেন।");
+          addHistory("লাকি স্পিন বোনাস", "+৳ ২০");
+        });
       }, 3000);
     }
 
-    function requestWithdraw() {
-      let amt = document.getElementById("withAmount").value;
+    window.requestWithdraw = function() {
+      let amt = parseInt(document.getElementById("withAmount").value);
       let num = document.getElementById("withNumber").value;
-      if (!amt || !num || amt < 500) {
-        alert("ন্যূনতম ৫০০ টাকা এবং সঠিক নম্বর দিন!");
-        return;
-      }
-      if (userBalance < amt) {
-        alert("আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই!");
-        return;
-      }
-      alert("উইথড্র রিকোয়েস্ট সফলভাবে পাঠানো হয়েছে!");
-      updateBal(-parseInt(amt));
-      addHistory("উইথড্র রিকোয়েস্ট", `-৳ ${amt}`);
-      switchTab('homeSection', document.querySelectorAll('.nav-item')[0]);
+      if (!amt || !num || amt < 500) { alert("ন্যূনতম ৫০০ টাকা এবং সঠিক নম্বর দিন!"); return; }
+      if (userBalance < amt) { alert("পর্যাপ্ত ব্যালেন্স নেই!"); return; }
+
+      let newBal = userBalance - amt;
+      update(ref(db, 'users/' + currentUser.uid), { balance: newBal }).then(() => {
+        alert("উইথড্র রিকোয়েস্ট পাঠানো হয়েছে!");
+        addHistory("উইথড্র রিকোয়েস্ট", `-৳ ${amt}`);
+        switchTab('homeSection', document.querySelectorAll('.nav-item')[0]);
+      });
     }
 
     function addHistory(title, amountStr) {
