@@ -3,156 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Pro - Earning System</title>
+  <title>Nexus Pro - Multi VIP Earning System</title>
   
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      background: #0d1117;
-      color: #e6edf3;
-      padding-bottom: 70px;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Roboto, sans-serif; }
+    body { background: #0d1117; color: #e6edf3; padding-bottom: 75px; }
 
-    .main-container { max-width: 500px; margin: 0 auto; background: #161b22; min-height: 100vh; position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
+    .main-container { max-width: 480px; margin: 0 auto; background: #161b22; min-height: 100vh; position: relative; box-shadow: 0 0 20px rgba(0,0,0,0.5); }
 
     /* টপ হেডার */
-    .top-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 15px;
-      background: #21262d;
-      border-bottom: 1px solid #30363d;
-    }
-    .brand-logo { font-size: 16px; font-weight: 900; color: #58a6ff; display: flex; align-items: center; gap: 6px; }
-    .header-right { display: flex; align-items: center; gap: 10px; }
-    .balance-pill { background: #238636; color: white; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+    .top-header { background: #21262d; padding: 12px 15px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #30363d; }
+    .brand-title { font-size: 16px; font-weight: 900; color: #58a6ff; }
+    .balance-badge { background: #238636; color: white; padding: 5px 12px; border-radius: 20px; font-size: 13px; font-weight: bold; }
 
     /* নোটিশ বার */
-    .notice-bar { background: #238636; color: white; padding: 8px 12px; font-size: 12px; display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; }
-    .notice-badge { background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; }
+    .notice-box { background: #238636; color: white; padding: 8px 12px; font-size: 12px; display: flex; align-items: center; gap: 8px; white-space: nowrap; overflow: hidden; }
+    .notice-tag { background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: bold; }
 
-    .section-header { text-align: left; font-size: 13px; font-weight: 900; color: #58a6ff; margin: 15px 15px 10px 15px; text-transform: uppercase; }
-
-    /* পেজ সেকশনগুলো (ট্যাব সিস্টেম) */
     .app-section { display: none; padding: 15px; }
     .app-section.active { display: block; }
 
-    .card-box {
-      background: #21262d;
-      border: 1px solid #30363d;
-      border-radius: 12px;
-      padding: 15px;
-      margin-bottom: 15px;
-    }
-    .card-box-title {
-      font-size: 13px;
-      font-weight: bold;
-      color: #e6edf3;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .custom-input {
-      width: 100%;
-      padding: 12px;
-      border: 1px solid #30363d;
-      border-radius: 8px;
-      font-size: 13px;
-      outline: none;
-      background: #0d1117;
-      color: #fff;
-      margin-bottom: 10px;
-    }
-    .custom-input:focus { border-color: #238636; }
-
-    .btn-submit {
-      width: 100%;
-      background: #238636;
-      color: white;
-      border: none;
-      padding: 12px;
-      border-radius: 8px;
-      font-weight: bold;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .btn-submit:hover { background: #2ea043; }
-
     .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
-    .info-box {
-      background: #21262d;
-      border: 1px solid #30363d;
-      border-radius: 10px;
-      padding: 12px;
-      text-align: center;
-    }
+    .info-box { background: #21262d; border: 1px solid #30363d; border-radius: 10px; padding: 12px; text-align: center; }
     .info-box span { font-size: 11px; color: #8b949e; }
-    .info-box h4 { font-size: 15px; color: #238636; margin-top: 4px; font-weight: bold; }
+    .info-box h4 { font-size: 14px; color: #58a6ff; margin-top: 4px; font-weight: bold; }
 
-    /* পেমেন্ট মেথড সিলেক্টর */
-    .payment-type-selector {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 10px;
-      margin-bottom: 12px;
-    }
-    .pay-type-card {
-      border: 1.5px solid #30363d;
-      border-radius: 8px;
-      padding: 10px;
-      text-align: center;
-      cursor: pointer;
-      background: #161b22;
-      color: #8b949e;
-      font-weight: bold;
-      font-size: 12px;
-    }
-    .pay-type-card.selected {
-      border-color: #238636;
-      background: #0f2d1e;
-      color: #fff;
-    }
+    .card-box { background: #21262d; border: 1px solid #30363d; border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+    .card-title { font-size: 13px; font-weight: bold; color: #e6edf3; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
 
-    /* স্পিন হুইল ডিজাইন */
-    .spin-box { text-align: center; padding: 10px 0; }
-    .wheel {
-      width: 180px; height: 180px; border-radius: 50%;
-      border: 6px solid #238636; margin: 0 auto 15px auto;
-      background: conic-gradient(#238636 0deg 90deg, #1f6feb 90deg 180deg, #bb8009 180deg 270deg, #da3633 270deg 360deg);
-      display: flex; align-items: center; justify-content: center;
-      transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
-    }
+    /* ভিআইপি প্যাকেজ গ্রিড লেআউট */
+    .vip-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .vip-card { background: #161b22; border: 1.5px solid #30363d; border-radius: 10px; padding: 10px; display: flex; flex-direction: column; justify-content: space-between; }
+    .vip-card.active-vip { border-color: #bb8009; background: #1f1b10; }
+    .vip-info h5 { font-size: 13px; color: #bb8009; font-weight: bold; }
+    .vip-info p { font-size: 10px; color: #8b949e; margin: 4px 0 8px 0; line-height: 1.3; }
+    .btn-vip { background: #bb8009; color: white; border: none; padding: 5px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; width: 100%; text-align: center; }
+    .btn-vip:hover { background: #d4930a; }
+
+    .custom-input { width: 100%; padding: 11px; background: #0d1117; border: 1px solid #30363d; border-radius: 8px; color: #fff; font-size: 13px; outline: none; margin-bottom: 10px; }
+    .custom-input:focus { border-color: #58a6ff; }
+
+    .btn-main { width: 100%; background: #238636; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; }
+    .btn-main:hover { background: #2ea043; }
+
+    .payment-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+    .pay-card { border: 1.5px solid #30363d; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; background: #161b22; color: #8b949e; font-weight: bold; font-size: 12px; }
+    .pay-card.selected { border-color: #238636; background: #0f2d1e; color: #fff; }
+
+    /* স্পিন হুইল */
+    .spin-container { text-align: center; padding: 10px 0; }
+    .wheel { width: 180px; height: 180px; border-radius: 50%; border: 6px solid #238636; margin: 0 auto 15px auto; background: conic-gradient(#238636 0deg 90deg, #1f6feb 90deg 180deg, #bb8009 180deg 270deg, #da3633 270deg 360deg); display: flex; align-items: center; justify-content: center; transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99); }
     .wheel-inner { background: #161b22; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; color: #fff; }
 
-    /* নিচের ফিক্সড ন্যাভবার (ভিডিওর মতো সিরিয়াল সাজানো) */
-    .bottom-nav {
-      position: fixed;
-      bottom: 0; left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      max-width: 500px;
-      background: #21262d;
-      border-top: 1px solid #30363d;
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      padding: 8px 0;
-      z-index: 999;
-    }
-    .nav-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: #8b949e;
-      font-size: 10px;
-      font-weight: 600;
-      cursor: pointer;
-    }
+    /* ফিক্সড ন্যাভবার */
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 480px; background: #21262d; border-top: 1px solid #30363d; display: flex; justify-content: space-around; align-items: center; padding: 8px 0; z-index: 999; }
+    .nav-item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: #8b949e; font-size: 11px; font-weight: 600; cursor: pointer; }
     .nav-item.active { color: #58a6ff; }
     .nav-item svg { width: 20px; height: 20px; margin-bottom: 2px; }
   </style>
@@ -161,106 +66,151 @@
 
   <div class="main-container">
     
-    <!-- ১. হোম পেজ ট্যাব -->
+    <!-- টপ হেডার -->
+    <div class="top-header">
+      <div class="brand-title">💎 Nexus Pro VIP</div>
+      <div class="balance-badge">৳ <span id="userBalance">২০০০</span></div>
+    </div>
+
+    <!-- নোটিশ বার -->
+    <div class="notice-box">
+      <span class="notice-tag">NOTICE</span>
+      <marquee scrollamount="4">বড় লিস্টের ভিআইপি প্যাকেজগুলো থেকে আপনার পছন্দেরটি কিনে নিন এবং অংক সলভ করে অটো ব্যালেন্স বাড়ান!</marquee>
+    </div>
+
+    <!-- ১. হোম সেকশন -->
     <div id="homeSection" class="app-section active">
-      <div class="top-header" style="margin: -15px -15px 15px -15px;">
-        <div class="brand-logo">💎 Nexus Pro (Earning)</div>
-        <div class="header-right">
-          <div class="balance-pill">৳ <span id="userBalance">৫০</span></div>
-        </div>
-      </div>
-
-      <div class="notice-bar" style="margin: -10px -15px 15px -15px;">
-        <span class="notice-badge">NOTICE</span>
-        <marquee scrollamount="4">⚡ সঠিক নিয়মে কাজ করুন এবং প্রতিদিন পেমেন্ট নিন!</marquee>
-      </div>
-
       <div class="info-grid">
         <div class="info-box">
           <span>সক্রিয় প্যাকেজ</span>
-          <h4 style="color: #bb8009;">ফ্রি মেম্বার</h4>
+          <h4 id="activeVipName" style="color: #bb8009;">ফ্রি মেম্বার</h4>
         </div>
         <div class="info-box">
-          <span>বাকি কাজ</span>
-          <h4>০ টি</h4>
+          <span>আজকের কাজ বাকি</span>
+          <h4 id="taskCount">০ টি</h4>
         </div>
       </div>
 
+      <!-- ভিআইপি প্যাকেজ বড় তালিকা (গুছানো গ্রিড ডিজাইন) -->
       <div class="card-box">
-        <div class="card-box-title">🔗 রেফার করে ইনকাম</div>
-        <input type="text" class="custom-input" value="01960931813" readonly style="margin-bottom:8px;">
-        <button class="btn-submit" onclick="alert('রেফার লিংক কপি হয়েছে!')">রেফার কোড কপি করুন</button>
-      </div>
-
-      <div class="card-box">
-        <div class="card-box-title">🧠 অংক সমাধান টাস্ক</div>
-        <p style="font-size: 12px; color: #8b949e; margin-bottom: 8px;">টাস্ক: <b>৩৩ + ১৩ = কত?</b></p>
-        <input type="number" id="mathAns" class="custom-input" placeholder="সঠিক উত্তর লিখুন">
-        <button class="btn-submit" onclick="submitMathTask()">উত্তর জমা দিন</button>
-      </div>
-
-      <div class="card-box">
-        <div class="card-box-title">🎁 ফ্রি বোনাস</div>
-        <button class="btn-submit" style="background: #bb8009;" onclick="claimBonus()">డైলি বোনাস নিন (৳২০)</button>
-      </div>
-    </div>
-
-    <!-- ২. ডিপোজিট ট্যাব -->
-    <div id="depositSection" class="app-section">
-      <div class="section-header" style="margin-top:0;">💳 টাকা ডিপোজিট করুন</div>
-      <div class="card-box">
-        <div style="font-size: 11px; color: #8b949e; margin-bottom: 6px;">পরিমাণ (ন্যূনতম ১০০ টাকা)</div>
-        <input type="number" class="custom-input" placeholder="টাকার পরিমাণ লিখুন" id="depAmount">
+        <div class="card-title">👑 ভিআইপি প্যাকেজ তালিকা</div>
         
-        <div style="font-size: 11px; color: #8b949e; margin-bottom: 6px;">পেমেন্ট মাধ্যম সিলেক্ট করুন</div>
-        <div class="payment-type-selector">
-          <div class="pay-type-card selected" onclick="selectPayMethod('বিকাশ', this)">বিকাশ (Personal)</div>
-          <div class="pay-type-card" onclick="selectPayMethod('নগদ', this)">নগদ (Personal)</div>
-        </div>
+        <div class="vip-grid">
+          <!-- ৫০০ টাকা প্যাকেজ -->
+          <div class="vip-card">
+            <div class="vip-info">
+              <h5>৫০০ টাকা প্যাকেজ</h5>
+              <p>প্রতি টাস্ক: ৫০৳<br>দৈনিক: ৩০০৳</p>
+            </div>
+            <button class="btn-vip" onclick="buyVip(500, '৫০০ টাকা প্যাকেজ', 6, 50)">ক্রয় করুন</button>
+          </div>
 
-        <div style="font-size: 11px; color: #8b949e; margin-bottom: 6px;">TrxID (ট্রানজেকশন আইডি)</div>
-        <input type="text" class="custom-input" placeholder="TrxID দিন" id="depTrx">
-        <button class="btn-submit" onclick="submitDeposit()">ডিপোজিট নিশ্চিত করুন</button>
+          <!-- ১০০০ টাকা প্যাকেজ -->
+          <div class="vip-card">
+            <div class="vip-info">
+              <h5>১০০০ টাকা প্যাকেজ</h5>
+              <p>প্রতি টাস্ক: ১০০৳<br>দৈনিক: ৬০০৳</p>
+            </div>
+            <button class="btn-vip" onclick="buyVip(1000, '১০০০ টাকা প্যাকেজ', 6, 100)">ক্রয় করুন</button>
+          </div>
+
+          <!-- ১৫০০ টাকা প্যাকেজ -->
+          <div class="vip-card">
+            <div class="vip-info">
+              <h5>১৫০০ টাকা প্যাকেজ</h5>
+              <p>প্রতি টাস্ক: ১৫০৳<br>দৈনিক: ৯০০৳</p>
+            </div>
+            <button class="btn-vip" onclick="buyVip(1500, '১৫০০ টাকা প্যাকেজ', 6, 150)">ক্রয় করুন</button>
+          </div>
+
+          <!-- ২০০০ টাকা প্যাকেজ -->
+          <div class="vip-card">
+            <div class="vip-info">
+              <h5>২০০০ টাকা প্যাকেজ</h5>
+              <p>প্রতি টাস্ক: ২০০৳<br>দৈনিক: ১২০০৳</p>
+            </div>
+            <button class="btn-vip" onclick="buyVip(2000, '২০০০ টাকা প্যাকেজ', 6, 200)">ক্রয় করুন</button>
+          </div>
+
+          <!-- ৩০০০ টাকা প্যাকেজ -->
+          <div class="vip-card">
+            <div class="vip-info">
+              <h5>৩০০০ টাকা প্যাকেজ</h5>
+              <p>প্রতি টাস্ক: ৩০০৳<br>দৈনিক: ১৮০০৳</p>
+            </div>
+            <button class="btn-vip" onclick="buyVip(3000, '৩০০০ টাকা প্যাকেজ', 6, 300)">ক্রয় করুন</button>
+          </div>
+
+          <!-- ৫০০০ টাকা প্যাকেজ -->
+          <div class="vip-card">
+            <div class="vip-info">
+              <h5>৫০০০ টাকা প্যাকেজ</h5>
+              <p>প্রতি টাস্ক: ৫০০৳<br>দৈনিক: ৩০০০৳</p>
+            </div>
+            <button class="btn-vip" onclick="buyVip(5000, '৫০০০ টাকা প্যাকেজ', 6, 500)">ক্রয় করুন</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- অংক সমাধান টাস্ক অপশন -->
+      <div class="card-box">
+        <div class="card-title">🧠 অংক সমাধান টাস্ক</div>
+        <p style="font-size: 12px; color: #8b949e; margin-bottom: 8px;" id="mathQuestion">টাস্ক: <b>প্যাকেজ কিনে কাজ শুরু করুন</b></p>
+        <input type="number" id="mathInput" class="custom-input" placeholder="সঠিক উত্তর লিখুন">
+        <button class="btn-main" onclick="submitMathTask()">উত্তর জমা দিন (অটো ব্যালেন্স যোগ)</button>
       </div>
     </div>
 
-    <!-- ৩. স্পিন ট্যাব -->
+    <!-- ২. ডিপোজিট সেকশন -->
+    <div id="depositSection" class="app-section">
+      <div class="card-box">
+        <div class="card-title">💳 টাকা ডিপোজিট করুন</div>
+        <input type="number" id="depAmount" class="custom-input" placeholder="টাকার পরিমাণ লিখুন">
+        
+        <div style="font-size: 11px; color: #8b949e; margin-bottom: 6px;">পেমেন্ট মাধ্যম</div>
+        <div class="payment-selector">
+          <div class="pay-card selected" onclick="selectPayment('বিকাশ', this)">বিকাশ (Personal)</div>
+          <div class="pay-card" onclick="selectPayment('নগদ', this)">নগদ (Personal)</div>
+        </div>
+
+        <input type="text" id="depTrx" class="custom-input" placeholder="TrxID (ট্রানজেকশন আইডি দিন)">
+        <button class="btn-main" onclick="submitDeposit()">ডিপোজিট নিশ্চিত করুন</button>
+      </div>
+    </div>
+
+    <!-- ৩. স্পিন সেকশন -->
     <div id="spinSection" class="app-section">
-      <div class="section-header" style="margin-top:0;">🎡 লাকি স্পিন হুইল</div>
-      <div class="card-box spin-box">
+      <div class="card-box spin-container">
+        <div class="card-title" style="justify-content: center;">🎡 লাকি স্পিন হুইল</div>
         <div class="wheel" id="spinWheel"><div class="wheel-inner">SPIN</div></div>
-        <button class="btn-submit" onclick="startSpin()">স্পিন করুন (বোনাস জিতুন)</button>
+        <button class="btn-main" onclick="startSpin()">স্পিন করুন</button>
       </div>
     </div>
 
-    <!-- ৪. উইথড্র ট্যাব -->
+    <!-- ৪. উইথড্র সেকশন -->
     <div id="withdrawSection" class="app-section">
-      <div class="section-header" style="margin-top:0;">💸 টাকা উত্তোলন (WITHDRAW)</div>
       <div class="card-box">
-        <div style="font-size: 12px; color: #8b949e; margin-bottom: 10px;">উত্তোলনের পরিমাণ (ন্যূনতম ৫০০ টাকা)</div>
-        <input type="number" class="custom-input" placeholder="৫০০ বা তার বেশি" id="withAmount">
-        <div style="font-size: 11px; color: #8b949e; margin-bottom: 6px;">বিকাশ/নগদ নম্বর</div>
-        <input type="text" class="custom-input" placeholder="আপনার পার্সোনাল নম্বর" id="withNum">
-        <button class="btn-submit" style="background: #da3633;" onclick="submitWithdraw()">উইথড্র রিকোয়েস্ট পাঠান</button>
+        <div class="card-title">💸 টাকা উত্তোলন (WITHDRAW)</div>
+        <input type="number" id="withAmount" class="custom-input" placeholder="উত্তোলনের পরিমাণ (ন্যূনতম ৫০০)">
+        <input type="text" id="withNumber" class="custom-input" placeholder="বিকাশ/নগদ পার্সোনাল নম্বর">
+        <button class="btn-main" style="background: #da3633;" onclick="requestWithdraw()">উইথড্র রিকোয়েস্ট পাঠান</button>
       </div>
     </div>
 
-    <!-- ৫. হিস্টরি / অর্ডার ট্যাব -->
+    <!-- ৫. হিস্টরি সেকশন -->
     <div id="historySection" class="app-section">
-      <div class="section-header" style="margin-top:0;">📊 সাম্প্রতিক হিস্টরি</div>
       <div class="card-box">
-        <div style="display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 8px; border-bottom: 1px solid #30363d; padding-bottom: 6px;">
-          <span>সাইন-আপ বোনাস</span>
-          <b style="color: #238636;">+৳ ৫০</b>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 12px; padding-bottom: 6px;">
-          <span>ডেইলি টাস্ক বোনাস</span>
-          <b style="color: #238636;">+৳ ২০</b>
+        <div class="card-title">📜 কাজের ও লেনদেনের হিস্টরি</div>
+        <div id="historyList" style="font-size: 12px; color: #8b949e;">
+          <div style="display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #30363d;">
+            <span>প্রাথমিক ব্যালেন্স</span>
+            <span style="color: #238636; font-weight: bold;">+৳ ২০০০</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- নিচের ফিক্সড ন্যাভবার (ভিডিওর মতো সিরিয়াল সাজানো) -->
+    <!-- ফিক্সড ন্যাভবার -->
     <div class="bottom-nav">
       <a class="nav-item active" onclick="switchTab('homeSection', this)">
         <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
@@ -287,8 +237,21 @@
   </div>
 
   <script>
-    let balance = 50;
-    let selectedMethod = "বিকাশ";
+    let userBalance = 2000;
+    let activePackage = "ফ্রি মেম্বার";
+    let remainingTasks = 0;
+    let rewardPerTask = 0;
+    let selectedPayMethod = "বিকাশ";
+
+    const mathProblems = [
+      { q: "১০ + ১৫ = কত?", a: "25" },
+      { q: "৫০ - ১২ = কত?", a: "38" },
+      { q: "৮ × ৫ = কত?", a: "40" },
+      { q: "৯০ ÷ ৩ = কত?", a: "30" },
+      { q: "২৫ + ৭৫ = কত?", a: "100" },
+      { q: "১০০ - ৪৫ = কত?", a: "55" }
+    ];
+    let currentTaskIndex = 0;
 
     function switchTab(sectionId, element) {
       document.querySelectorAll('.app-section').forEach(sec => sec.classList.remove('active'));
@@ -301,30 +264,76 @@
       window.scrollTo(0, 0);
     }
 
-    function updateBalance(amt) {
-      balance += amt;
-      document.getElementById("userBalance").innerText = balance;
+    function updateBal(amount) {
+      userBalance += amount;
+      document.getElementById("userBalance").innerText = userBalance;
     }
 
-    function submitMathTask() {
-      let ans = document.getElementById("mathAns").value;
-      if (ans === "46") {
-        alert("সঠিক উত্তর! ১০ টাকা বোনাস যোগ হয়েছে।");
-        updateBalance(10);
-        document.getElementById("mathAns").value = "";
+    function buyVip(price, packageName, tasks, perTaskReward) {
+      if (userBalance < price) {
+        alert("আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই! আগে ডিপোজিট করুন।");
+        return;
+      }
+      updateBal(-price);
+      activePackage = packageName;
+      remainingTasks = tasks;
+      rewardPerTask = perTaskReward;
+      currentTaskIndex = 0;
+      
+      document.getElementById("activeVipName").innerText = activePackage;
+      document.getElementById("taskCount").innerText = remainingTasks + " টি";
+      loadNextMathQuestion();
+
+      alert(`অভিনন্দন! আপনি সফলভাবে ${packageName} কিনেছেন। এখন থেকে কাজ করতে পারবেন।`);
+      addHistory(`ভিআইপি ক্রয় (${packageName})`, `-৳ ${price}`);
+    }
+
+    function loadNextMathQuestion() {
+      if (remainingTasks > 0) {
+        let prob = mathProblems[currentTaskIndex % mathProblems.length];
+        document.getElementById("mathQuestion").innerHTML = `টাস্ক (${7 - remainingTasks}/6): <b>${prob.q}</b>`;
+        document.getElementById("mathInput").dataset.ans = prob.a;
       } else {
-        alert("ভুল উত্তর! আবার চেষ্টা করুন।");
+        document.getElementById("mathQuestion").innerHTML = `<b>আজকের সব কাজ সম্পন্ন হয়েছে!</b>`;
       }
     }
 
-    function claimBonus() {
-      alert("ডেইলি বোনাস সফলভাবে ক্লাইম হয়েছে!");
-      updateBalance(20);
+    function submitMathTask() {
+      if (activePackage === "ফ্রি মেম্বার") {
+        alert("টাস্ক সম্পন্ন করতে আগে যেকোনো একটি ভিআইপি প্যাকেজ কিনুন!");
+        return;
+      }
+      if (remainingTasks <= 0) {
+        alert("আজকের আপনার সব টাস্ক শেষ! কাল আবার চেষ্টা করুন।");
+        return;
+      }
+
+      let userAns = document.getElementById("mathInput").value;
+      let correctAns = document.getElementById("mathInput").dataset.ans;
+
+      if (userAns === correctAns) {
+        updateBal(rewardPerTask);
+        remainingTasks--;
+        currentTaskIndex++;
+        
+        document.getElementById("taskCount").innerText = remainingTasks + " টি";
+        alert(`সঠিক উত্তর! আপনার মূল ব্যালেন্সে ${rewardPerTask} টাকা অটোমেটিক যোগ হয়েছে।`);
+        addHistory("অংক সমাধান টাস্ক", `+৳ ${rewardPerTask}`);
+        document.getElementById("mathInput").value = "";
+
+        if (remainingTasks > 0) {
+          loadNextMathQuestion();
+        } else {
+          document.getElementById("mathQuestion").innerHTML = `<b>আজকের টাস্কগুলো শেষ হয়েছে!</b>`;
+        }
+      } else {
+        alert("উত্তর ভুল হয়েছে! সঠিক উত্তর লিখে আবার চেষ্টা করুন।");
+      }
     }
 
-    function selectPayMethod(method, el) {
-      selectedMethod = method;
-      document.querySelectorAll('.pay-type-card').forEach(c => c.classList.remove('selected'));
+    function selectPayment(method, el) {
+      selectedPayMethod = method;
+      document.querySelectorAll('.pay-card').forEach(c => c.classList.remove('selected'));
       el.classList.add('selected');
     }
 
@@ -332,10 +341,12 @@
       let amt = document.getElementById("depAmount").value;
       let trx = document.getElementById("depTrx").value;
       if (!amt || !trx) {
-        alert("দয়া করে পরিমাণ এবং TrxID দিন!");
+        alert("দয়া করে টাকার পরিমাণ এবং TrxID দিন!");
         return;
       }
-      alert(`আপনার ${selectedMethod} ডিপোজিট রিকোয়েস্ট সফলভাবে জমা হয়েছে!`);
+      alert(`আপনার ${selectedPayMethod} ডিপোজিট রিকোয়েস্ট সফলভাবে জমা হয়েছে!`);
+      updateBal(parseInt(amt));
+      addHistory(`ডিপোজিট (${selectedPayMethod})`, `+৳ ${amt}`);
       document.getElementById("depAmount").value = "";
       document.getElementById("depTrx").value = "";
       switchTab('homeSection', document.querySelectorAll('.nav-item')[0]);
@@ -349,25 +360,35 @@
       wheel.style.transform = `rotate(${currentDegree}deg)`;
       
       setTimeout(() => {
-        alert("স্পিন সফল! আপনি ১৫ টাকা জিতেছেন।");
-        updateBalance(15);
+        alert("স্পিন সফল! আপনি ২০ টাকা বোনাস জিতেছেন।");
+        updateBal(20);
+        addHistory("লাকি স্পিন বোনাস", "+৳ ২০");
       }, 3000);
     }
 
-    function submitWithdraw() {
+    function requestWithdraw() {
       let amt = document.getElementById("withAmount").value;
-      let num = document.getElementById("withNum").value;
+      let num = document.getElementById("withNumber").value;
       if (!amt || !num || amt < 500) {
-        alert("ন্যূনতম ৫০০ টাকা বা সঠিক তথ্য দিন!");
+        alert("ন্যূনতম ৫০০ টাকা এবং সঠিক নম্বর দিন!");
         return;
       }
-      if (balance < amt) {
-        alert("আপনার একাউন্টে পর্যাপ্ত ব্যালেন্স নেই!");
+      if (userBalance < amt) {
+        alert("আপনার অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই!");
         return;
       }
       alert("উইথড্র রিকোয়েস্ট সফলভাবে পাঠানো হয়েছে!");
-      updateBalance(-parseInt(amt));
+      updateBal(-parseInt(amt));
+      addHistory("উইথড্র রিকোয়েস্ট", `-৳ ${amt}`);
       switchTab('homeSection', document.querySelectorAll('.nav-item')[0]);
+    }
+
+    function addHistory(title, amountStr) {
+      let list = document.getElementById("historyList");
+      let item = document.createElement("div");
+      item.style.cssText = "display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #30363d;";
+      item.innerHTML = `<span>${title}</span><span style="color: ${amountStr.includes('+') ? '#238636' : '#da3633'}; font-weight: bold;">${amountStr}</span>`;
+      list.prepend(item);
     }
   </script>
 
