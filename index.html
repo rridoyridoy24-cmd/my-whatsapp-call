@@ -1,597 +1,784 @@
 <!DOCTYPE html>
 <html lang="bn">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus Pro - Advanced Earning Platform</title>
-    <style>
-        :root {
-            --bg: #090d16;
-            --card: #111827;
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --text: #f3f4f6;
-            --muted: #9ca3af;
-            --border: #1f2937;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HASAN GAMER BD TOPUP & EARNING</title>
+  
+  <!-- PWA Manifest Link -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#16a34a">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      padding-bottom: 70px;
+    }
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px 10px;
-        }
+    .main-container { max-width: 500px; margin: 0 auto; background: #161b22; min-height: 100vh; position: relative; box-shadow: 0 0 15px rgba(0,0,0,0.5); }
 
-        .main-wrapper {
-            width: 100%;
-            max-width: 440px;
-            background: var(--card);
-            border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
-            border: 1px solid var(--border);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
+    /* টপ হেডার */
+    .top-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 15px;
+      background: #21262d;
+      border-bottom: 1px solid #30363d;
+    }
+    .brand-logo { font-size: 16px; font-weight: 900; color: #e6edf3; display: flex; align-items: center; gap: 6px; }
+    .brand-logo span { color: #16a34a; }
+    
+    .header-right { display: flex; align-items: center; gap: 10px; }
+    .balance-pill { background: #16a34a; color: white; padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+    .profile-avatar { width: 36px; height: 36px; background: #dcfce7; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #16a34a; border: 2px solid #16a34a; cursor: pointer; }
 
-        .app-header {
-            background: linear-gradient(135deg, #4f46e5, #312e81);
-            padding: 25px 20px;
-            text-align: center;
-            border-bottom: 1px solid var(--border);
-        }
-        .app-header h1 { font-size: 22px; color: #fff; font-weight: 700; margin-bottom: 4px; }
-        .app-header p { font-size: 13px; color: #c7d2fe; }
+    /* নোটিশ বার */
+    .notice-bar { background: #16a34a; color: white; padding: 8px 12px; font-size: 12px; display: flex; align-items: center; gap: 8px; overflow: hidden; white-space: nowrap; }
+    .notice-badge { background: rgba(255,255,255,0.2); padding: 2px 6px; border-radius: 4px; font-weight: bold; font-size: 10px; }
 
-        .app-body {
-            padding: 20px;
-            max-height: 75vh;
-            overflow-y: auto;
-        }
+    .section-header { text-align: left; font-size: 14px; font-weight: 900; color: #58a6ff; margin: 15px 15px 10px 15px; letter-spacing: 0.5px; }
 
-        .app-body::-webkit-scrollbar { width: 5px; }
-        .app-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+    /* পেজ সেকশনগুলো (ট্যাব সিস্টেম) */
+    .app-section { display: none; padding: 15px; }
+    .app-section.active { display: block; }
 
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 14px;
-            outline: none;
-            transition: all 0.3s ease;
-        }
-        .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); }
+    /* গ্রিড ডিজাইন (হোমপেজ কার্ড) */
+    .offer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 0 15px 15px 15px; }
+    .offer-card { background: #21262d; border: 1px solid #30363d; border-radius: 10px; overflow: hidden; text-align: center; cursor: pointer; transition: transform 0.2s; }
+    .offer-card:hover { transform: translateY(-2px); border-color: #16a34a; }
+    .offer-card img { width: 100%; height: 85px; object-fit: cover; display: block; }
+    .offer-card-title { font-size: 11px; font-weight: bold; padding: 8px 4px; color: #c9d1d9; background: #1f242c; border-top: 1px solid #30363d; }
 
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: background 0.2s;
-        }
-        .btn:hover { background: var(--primary-hover); }
-        .btn-success { background: var(--success); }
-        .btn-warning { background: var(--warning); color: #000; }
-        .btn-danger { background: var(--danger); }
+    .game-top-banner {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    .game-top-banner img { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+    .game-title-text h3 { font-size: 15px; font-weight: bold; color: #e6edf3; }
+    .game-title-text p { font-size: 11px; color: #16a34a; margin-top: 2px; font-weight: bold; }
 
-        .alert {
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 13px;
-            margin-bottom: 15px;
-            text-align: center;
-            display: none;
-            font-weight: 500;
-        }
-        .alert-success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid var(--success); }
-        .alert-error { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid var(--danger); }
+    .card-box {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 15px;
+      margin-bottom: 15px;
+    }
+    .card-box-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #58a6ff;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .wallet-card {
-            background: linear-gradient(135deg, #059669, #065f46);
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            margin-bottom: 15px;
-            box-shadow: 0 10px 20px rgba(5, 150, 105, 0.2);
-        }
-        .wallet-card h3 { font-size: 12px; color: #d1fae5; text-transform: uppercase; letter-spacing: 1px; }
-        .wallet-card h1 { font-size: 30px; color: #fff; margin-top: 5px; font-weight: 700; }
+    /* প্যাকেজ সিলেকশন গ্রিড */
+    .packages-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .package-option {
+      border: 1.5px solid #30363d;
+      border-radius: 8px;
+      padding: 10px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #161b22;
+    }
+    .package-option.selected {
+      border-color: #16a34a;
+      background: #0f2d1e;
+    }
+    .pkg-left { display: flex; align-items: center; gap: 8px; }
+    .pkg-radio {
+      width: 16px; height: 16px; border: 2px solid #8b949e; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .package-option.selected .pkg-radio {
+      border-color: #16a34a;
+      background: #16a34a;
+      box-shadow: inset 0 0 0 3px #161b22;
+    }
+    .package-name { font-size: 11px; font-weight: bold; color: #c9d1d9; line-height: 1.3; }
+    .package-price { font-size: 13px; font-weight: 900; color: #f0883e; flex-shrink: 0; margin-left: 5px; }
 
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .info-box {
-            background: var(--bg);
-            padding: 12px;
-            border-radius: 12px;
-            text-align: center;
-            border: 1px solid var(--border);
-        }
-        .info-box span { font-size: 11px; color: var(--muted); }
-        .info-box h4 { font-size: 14px; color: #fff; margin-top: 4px; }
+    .uid-input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #30363d;
+      border-radius: 8px;
+      font-size: 13px;
+      outline: none;
+      background: #0d1117;
+      color: #fff;
+    }
+    .uid-input:focus { border-color: #16a34a; }
 
-        .section-title {
-            font-size: 13px;
-            font-weight: 700;
-            margin: 20px 0 10px 0;
-            color: #e5e7eb;
-            border-left: 3px solid var(--primary);
-            padding-left: 8px;
-            text-transform: uppercase;
-        }
+    .payment-type-selector {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      margin-bottom: 15px;
+    }
+    .pay-type-card {
+      border: 1.5px solid #30363d;
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      cursor: pointer;
+      background: #161b22;
+    }
+    .pay-type-card.selected {
+      border-color: #16a34a;
+      background: #0f2d1e;
+    }
+    .pay-type-card img { height: 22px; object-fit: contain; margin-bottom: 4px; }
 
-        .package-card, .custom-box {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 15px;
-            margin-bottom: 12px;
-        }
-        .package-card h4 { font-size: 15px; color: #fff; margin-bottom: 4px; }
-        .package-card p { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+    .btn-back-home {
+      background: #30363d;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
 
-        .notice-ticker {
-            background: var(--bg);
-            border: 1px solid var(--border);
-            padding: 10px;
-            border-radius: 10px;
-            font-size: 12px;
-            color: var(--warning);
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
+    .btn-order-submit {
+      width: 100%;
+      background: #238636;
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 15px;
+      cursor: pointer;
+    }
 
-        .history-list {
-            font-size: 12px;
-            background: var(--bg);
-            padding: 10px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            max-height: 100px;
-            overflow-y: auto;
-            color: var(--muted);
-        }
+    /* অর্ডার হিস্টরি কার্ড ডিজাইন */
+    .order-item-card {
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .order-info h4 { font-size: 13px; color: #e6edf3; font-weight: bold; }
+    .order-info p { font-size: 11px; color: #8b949e; margin-top: 2px; }
+    .order-status {
+      font-size: 11px;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 20px;
+    }
+    .status-pending { background: #38290f; color: #f0883e; }
+    .status-completed { background: #0f2d1e; color: #238636; }
 
-        .nav-links {
-            text-align: center;
-            margin-top: 15px;
-            font-size: 13px;
-            color: var(--muted);
-        }
-        .nav-links span {
-            color: var(--primary);
-            text-decoration: underline;
-            font-weight: 600;
-            cursor: pointer;
-        }
+    /* স্পিন হুইল ডিজাইন */
+    .spin-box { text-align: center; padding: 10px 0; }
+    .wheel {
+      width: 180px; height: 180px; border-radius: 50%;
+      border: 6px solid #238636; margin: 0 auto 15px auto;
+      background: conic-gradient(#238636 0deg 90deg, #1f6feb 90deg 180deg, #bb8009 180deg 270deg, #da3633 270deg 360deg);
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 3s cubic-bezier(0.17, 0.67, 0.12, 0.99);
+    }
+    .wheel-inner { background: #161b22; width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 11px; color: #fff; }
 
-        .page-section { display: none; }
-        .page-section.active { display: block; }
-    </style>
+    /* সফল অর্ডার পপআপ মোডাল */
+    #successModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .modal-content {
+      background: #21262d;
+      width: 100%;
+      max-width: 340px;
+      border-radius: 14px;
+      padding: 25px 20px;
+      text-align: center;
+      border: 1px solid #30363d;
+    }
+    .modal-icon { font-size: 50px; color: #238636; margin-bottom: 12px; }
+    .modal-title { font-size: 16px; font-weight: 900; color: #e6edf3; margin-bottom: 8px; }
+    .modal-desc { font-size: 12.5px; color: #8b949e; line-height: 1.6; margin-bottom: 20px; }
+    .modal-btn {
+      background: #238636; color: white; border: none; padding: 12px;
+      border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; width: 100%;
+    }
+
+    /* লগইন ও হোয়াটসঅ্যাপ বাটন স্টাইল */
+    .google-btn {
+      width: 100%; background: #21262d; color: #e6edf3; border: 1px solid #30363d;
+      padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px;
+    }
+    .whatsapp-btn {
+      width: 100%; background: #238636; color: white; border: none;
+      padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px;
+    }
+
+    /* নিচের ফিক্সড ন্যাভবার (ভিডিওর মতো সিরিয়াল সাজানো) */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 500px;
+      background: #21262d;
+      border-top: 1px solid #30363d;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      padding: 8px 0;
+      z-index: 999;
+    }
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-decoration: none;
+      color: #8b949e;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .nav-item.active { color: #58a6ff; }
+    .nav-item svg { width: 20px; height: 20px; margin-bottom: 2px; }
+  </style>
 </head>
 <body>
 
-<div class="main-wrapper">
-    <div class="app-header">
-        <h1 id="brand-title">💎 Nexus Pro</h1>
-        <p id="brand-subtitle">অ্যাডভান্সড টাস্ক ও আর্নিং সিস্টেম</p>
+  <div class="main-container">
+    
+    <!-- ১. হোম পেজ ট্যাব -->
+    <div id="homeSection" class="app-section active">
+      <div class="top-header" style="margin: -15px -15px 15px -15px;">
+        <div class="brand-logo">
+          <svg width="20" height="20" fill="none" stroke="#238636" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+          HASAN GAMER <span>BD TOPUP</span>
+        </div>
+        <div class="header-right">
+          <div class="balance-pill">৳ 0</div>
+          <div class="profile-avatar" id="headerAvatar" onclick="switchTab('accountSection', document.querySelectorAll('.nav-item')[4])" title="My Account">R</div>
+        </div>
+      </div>
+
+      <div class="notice-bar" style="margin: -10px -15px 15px -15px;">
+        <span class="notice-badge">NOTICE</span>
+        <marquee scrollamount="4">⚡ উইকলি ও মান্থলির দাম আগের মতো এবং শুধু ডায়মন্ড প্যাকেজে ১০ টাকা বাড়ানো হয়েছে!</marquee>
+      </div>
+
+      <div class="section-header" style="margin-top:0;">NEW OFFER & SPIN</div>
+      <div class="offer-grid">
+        <div class="offer-card" onclick="openDetailPage('Lucky Spin', 'https://i.ibb.co.com/hxFt2rrR/game-1770666770.png')">
+          <img src="https://i.ibb.co.com/hxFt2rrR/game-1770666770.png" alt="Lucky Spin">
+          <div class="offer-card-title">Lucky Spin</div>
+        </div>
+        <div class="offer-card" onclick="openDetailPage('Weekly/Monthly Offer', 'https://i.ibb.co.com/jP4dLr4C/game-1770827804.jpg')">
+          <img src="https://i.ibb.co.com/jP4dLr4C/game-1770827804.jpg" alt="Weekly/Monthly">
+          <div class="offer-card-title">Weekly/Monthly</div>
+        </div>
+        <div class="offer-card" onclick="openDetailPage('FF ID Likes', 'https://i.ibb.co.com/7t11hL6/game-1770666618.png')">
+          <img src="https://i.ibb.co.com/7t11hL6/game-1770666618.png" alt="FF ID Likes">
+          <div class="offer-card-title">FF ID Likes</div>
+        </div>
+      </div>
+
+      <div class="section-header">HASAN SPECIAL & PREMIUM</div>
+      <div class="offer-grid">
+        <div class="offer-card" onclick="openDetailPage('UID টপআপ', 'https://i.ibb.co.com/TBRTc7k7/game-1770827701.jpg')">
+          <img src="https://i.ibb.co.com/TBRTc7k7/game-1770827701.jpg" alt="UID টপআপ">
+          <div class="offer-card-title">UID টপআপ</div>
+        </div>
+        <div class="offer-card" onclick="openDetailPage('Weekly Lite Offer', 'https://i.ibb.co.com/99p0gnwg/game-1770827784.jpg')">
+          <img src="https://i.ibb.co.com/99p0gnwg/game-1770827784.jpg" alt="Weekly Lite Offer">
+          <div class="offer-card-title">Weekly Lite</div>
+        </div>
+        <div class="offer-card" onclick="openDetailPage('VIP Premium', 'https://i.ibb.co.com/qYRRnsSQ/game-1770827744.jpg')">
+          <img src="https://i.ibb.co.com/qYRRnsSQ/game-1770827744.jpg" alt="VIP Premium">
+          <div class="offer-card-title" style="color: #f85149;">VIP Premium</div>
+        </div>
+      </div>
     </div>
 
-    <div class="app-body">
-        <div id="alert-box" class="alert"></div>
-
-        <!-- ১. লগইন পেজ -->
-        <div id="login-page" class="page-section">
-            <div class="form-group">
-                <label>ফোন নম্বর</label>
-                <input type="text" id="login-phone" class="form-control" placeholder="আপনার রেজিস্টার্ড নম্বর">
-            </div>
-            <div class="form-group">
-                <label>পাসওয়ার্ড</label>
-                <input type="password" id="login-pass" class="form-control" placeholder="পাসওয়ার্ড দিন">
-            </div>
-            <button onclick="loginUser()" class="btn">লগইন করুন</button>
-            <div class="nav-links">
-                কোনো অ্যাকাউন্ট নেই? <span onclick="switchPage('register-page')">রেজিস্ট্রেশন করুন</span>
-            </div>
+    <!-- বিবরণ পেজ (টপআপ সিলেক্ট করার জন্য) -->
+    <div id="detailSection" class="app-section">
+      <button class="btn-back-home" onclick="switchTab('homeSection', document.querySelectorAll('.nav-item')[0])">⬅️ Back to Home</button>
+      
+      <div class="game-top-banner">
+        <img id="detailImg" src="" alt="Game Icon">
+        <div class="game-title-text">
+          <h3 id="detailTitle">Title</h3>
+          <p>⚡ ২ সেকেন্ডে টপআপ</p>
         </div>
+      </div>
 
-        <!-- ২. রেজিস্ট্রেশন পেজ -->
-        <div id="register-page" class="page-section">
-            <div class="form-group">
-                <label>আপনার নাম</label>
-                <input type="text" id="reg-name" class="form-control" placeholder="পুরো নাম লিখুন">
-            </div>
-            <div class="form-group">
-                <label>ফোন নম্বর</label>
-                <input type="text" id="reg-phone" class="form-control" placeholder="১১ ডিজিটের মোবাইল নম্বর">
-            </div>
-            <div class="form-group">
-                <label>পাসওয়ার্ড</label>
-                <input type="password" id="reg-pass" class="form-control" placeholder="পাসওয়ার্ড দিন">
-            </div>
-            <div class="form-group">
-                <label>রেফারেল কোড (ঐচ্ছিক)</label>
-                <input type="text" id="reg-ref" class="form-control" placeholder="বন্ধুর ফোন নম্বর (যদি থাকে)">
-            </div>
-            <button onclick="registerUser()" class="btn btn-success">অ্যাকাউন্ট তৈরি করুন</button>
-            <div class="nav-links">
-                ইতিমধ্যে অ্যাকাউন্ট আছে? <span onclick="switchPage('login-page')">লগইন করুন</span>
-            </div>
-        </div>
+      <div class="card-box">
+        <div class="card-box-title">1️⃣ Select Recharge</div>
+        <div class="packages-grid" id="packagesContainer"></div>
+      </div>
 
-        <!-- ৩. ড্যাশবোর্ড পেজ -->
-        <div id="dashboard-page" class="page-section">
-            <div class="notice-ticker">📢 নোটিশ: সঠিক নিয়মে কাজ করুন এবং রেফার করে বাড়তি আয় করুন!</div>
+      <div class="card-box">
+        <div class="card-box-title">2️⃣ Account Info</div>
+        <div style="font-size: 11px; color: #8b949e; margin-bottom: 6px;">এখানে গেমের আইডি কোড দিন</div>
+        <input type="text" id="playerUID" class="uid-input" placeholder="এখানে গেমের আইডি কোড দিন">
+      </div>
 
-            <div class="wallet-card">
-                <h3>প্রধান ব্যালেন্স</h3>
-                <h1>৳ <span id="user-balance">0</span></h1>
-            </div>
-
-            <div class="grid-2">
-                <div class="info-box">
-                    <span>সক্রিয় প্যাকেজ</span>
-                    <h4 id="user-level" style="color: var(--warning);">ফ্রি মেম্বার</h4>
-                </div>
-                <div class="info-box">
-                    <span>বাকি কাজ</span>
-                    <h4 id="task-left">0 টি</h4>
-                </div>
-            </div>
-
-            <!-- রেফারেল সিস্টেম -->
-            <div class="section-title">রেফার করে ইনকাম</div>
-            <div class="custom-box">
-                <p style="font-size: 12px; color: var(--muted); margin-bottom: 8px;">আপনার রেফারেল কোড (ফোন নম্বর):</p>
-                <input type="text" id="my-ref-code" class="form-control" readonly style="text-align: center; font-weight: bold; margin-bottom: 8px;">
-                <button onclick="copyRefLink()" class="btn" style="padding: 8px; font-size: 13px;">রেফার কোড কপি করুন</button>
-            </div>
-
-            <!-- অংক টাস্ক -->
-            <div class="section-title">অংক সমাধান টাস্ক</div>
-            <div class="custom-box" style="text-align: center;">
-                <p id="math-question" style="font-size: 16px; font-weight: 700; color: var(--warning); margin-bottom: 12px;"></p>
-                <div class="form-group" style="margin-bottom: 10px;">
-                    <input type="number" id="math-answer" class="form-control" placeholder="সঠিক উত্তর লিখুন">
-                </div>
-                <button onclick="submitMathTask()" class="btn btn-success" style="padding: 10px;">উত্তর জমা দিন</button>
-            </div>
-
-            <!-- ডেইলি বোনাস -->
-            <div class="section-title">ফ্রি বোনাস</div>
-            <button onclick="claimDailyBonus()" class="btn btn-warning" style="padding: 10px; margin-bottom: 15px; font-weight: bold;">🎁 ডেইলি বোনাস নিন (৳২০)</button>
-
-            <!-- ডিপোজিট -->
-            <div class="section-title">টাকা ডিপোজিট করুন</div>
-            <div class="custom-box">
-                <div class="form-group" style="margin-bottom: 8px;">
-                    <input type="number" id="dep-amount" class="form-control" placeholder="পরিমাণ (ন্যূনতম ১০০ টাকা)">
-                </div>
-                <div class="form-group" style="margin-bottom: 8px;">
-                    <select id="dep-method" class="form-control">
-                        <option value="বিকাশ">বিকাশ (Personal)</option>
-                        <option value="নগদ">নগদ (Personal)</option>
-                    </select>
-                </div>
-                <div class="form-group" style="margin-bottom: 8px;">
-                    <input type="text" id="dep-trx" class="form-control" placeholder="TrxID (ট্রানজাকশন আইডি)">
-                </div>
-                <button onclick="depositMoney()" class="btn btn-success" style="padding: 10px;">ডিপোজিট নিশ্চিত করুন</button>
-            </div>
-
-            <!-- উইথড্র -->
-            <div class="section-title">টাকা উত্তোলন (Withdraw)</div>
-            <div class="custom-box">
-                <div class="form-group" style="margin-bottom: 8px;">
-                    <input type="number" id="w-amount" class="form-control" placeholder="উত্তোলনের পরিমাণ (ন্যূনতম ৫০০)">
-                </div>
-                <button onclick="withdrawMoney()" class="btn btn-danger" style="padding: 10px;">উইথড্র রিকোয়েস্ট পাঠান</button>
-            </div>
-
-            <!-- লেনদেন হিস্ট্রি -->
-            <div class="section-title">সাম্প্রতিক হিস্ট্রি</div>
-            <div id="history-box" class="history-list">কোনো হিস্ট্রি নেই</div>
-
-            <!-- ভিআইপি প্যাকেজ -->
-            <div class="section-title">ভিআইপি প্যাকেজসমূহ (মেয়াদ ৪০ দিন)</div>
-
-            <div class="package-card">
-                <h4>🥉 ব্রোঞ্জ প্যানেল</h4>
-                <p>মূল্য: ৳৫০০ | মেয়াদ: ৪০ দিন</p>
-                <p>দৈনিক ৬টি কাজ (প্রতি কাজ ৳৫০)</p>
-                <button onclick="buyPackage(500, 'ব্রোঞ্জ প্যানেল', 6, 50)" class="btn" style="padding: 8px; margin-top: 8px;">প্যাকেজ কিনুন</button>
-            </div>
-
-            <div class="package-card">
-                <h4>🥈 সিলভার প্যানেল</h4>
-                <p>মূল্য: ৳১,৫০০ | মেয়াদ: ৪০ দিন</p>
-                <p>দৈনিক ৫টি কাজ (প্রতি কাজ ৳১০০)</p>
-                <button onclick="buyPackage(1500, 'সিলভার প্যানেল', 5, 100)" class="btn btn-success" style="padding: 8px; margin-top: 8px;">প্যাকেজ কিনুন</button>
-            </div>
-
-            <div class="package-card">
-                <h4>🥇 গোল্ড ভিআইপি প্যানেল</h4>
-                <p>মূল্য: ৳৫,০০০ | মেয়াদ: ৪০ দিন</p>
-                <p>দৈনিক ১০টি কাজ (প্রতি কাজ ৳২০০)</p>
-                <button onclick="buyPackage(5000, 'গোল্ড ভিআইপি', 10, 200)" class="btn btn-warning" style="padding: 8px; margin-top: 8px; color:#000;">প্যাকেজ কিনুন</button>
-            </div>
-
-            <div class="nav-links" style="margin-top: 25px;">
-                <span onclick="logoutUser()" style="color: var(--danger); cursor: pointer; font-size: 14px;">লগআউট করুন</span>
-            </div>
-        </div>
+      <button class="btn-order-submit" onclick="goToPaymentFromDetail()">Buy Now (পেমেন্টে যান)</button>
     </div>
-</div>
 
-<script>
-    let currentAns = 0;
+    <!-- ২. ডিপোজিট ও পেমেন্ট ট্যাব -->
+    <div id="depositSection" class="app-section">
+      <div class="section-header" style="margin-top:0;">💳 ডিপোজিট ও পেমেন্ট সিস্টেম</div>
+      <div class="card-box">
+        <div class="card-box-title">মোবাইল ব্যাংকিং (বিকাশ / নগদ)</div>
+        <div class="payment-type-selector">
+          <div class="pay-type-card selected" onclick="selectBkashNagad('bKash', this)">
+            <img src="https://i.ibb.co.com/8410228/bkash.png" alt="bKash" onerror="this.src='https://via.placeholder.com/80x25?text=bKash'">
+            <div style="font-size: 10px; font-weight: bold;">bKash</div>
+          </div>
+          <div class="pay-type-card" onclick="selectBkashNagad('Nagad', this)">
+            <img src="https://i.ibb.co.com/6J9Lz64/nagad.png" alt="nagad" onerror="this.src='https://via.placeholder.com/80x25?text=nagad'">
+            <div style="font-size: 10px; font-weight: bold;">নগদ</div>
+          </div>
+        </div>
 
-    function showAlert(msg, type) {
-        const box = document.getElementById('alert-box');
-        box.innerText = msg;
-        box.className = "alert alert-" + type;
-        box.style.display = "block";
-        setTimeout(() => { box.style.display = "none"; }, 4000);
-    }
+        <div style="background: #161b22; padding: 12px; border-radius: 8px; border: 1px solid #30363d; font-size: 12px; line-height: 1.6; margin-bottom: 12px;">
+          - *Send Money* করুন এই নম্বরে: <b id="payNumberDisplay" style="color: #238636;">01972839306</b> 
+          <button onclick="copyPayNumber()" style="background:#238636; color:#fff; border:none; padding:2px 6px; border-radius:4px; font-size:10px; cursor:pointer; margin-left:5px;">Copy</button><br>
+          - টাকার পরিমাণ: <b id="payAmountDisplay" style="color: #f0883e;">৳ 0</b><br>
+          - <b style="color: #f85149;">শুধুমাত্র সেন্ড মানি (Send Money) করবেন।</b>
+        </div>
 
-    function switchPage(pageId) {
-        document.querySelectorAll('.page-section').forEach(section => {
-            section.classList.remove('active');
-        });
-        const target = document.getElementById(pageId);
-        if (target) target.classList.add('active');
+        <div style="font-size: 11px; color: #8b949e; margin-bottom: 6px;">যে নাম্বার থেকে টাকা পাঠিয়েছেন (Sender Number)</div>
+        <input type="text" id="senderNumberInput" class="uid-input" placeholder="যে নাম্বার থেকে টাকা পাঠিয়েছেন" style="margin-bottom: 12px;">
+
+        <div style="font-size: 11px; color: #8b949e; margin-bottom: 6px;">ট্রানজেকশন আইডি দিন</div>
+        <input type="text" id="trxIDInput" class="uid-input" placeholder="ট্রানজেকশন আইডি দিন" style="margin-bottom: 12px;">
         
-        if(pageId === 'dashboard-page') {
-            checkDailyReset();
-            generateMathProblem();
-            loadDashboard();
-        }
-    }
+        <button class="btn-order-submit" onclick="submitOrder()">ভেরিফাই ও অর্ডার কনফার্ম</button>
+      </div>
+    </div>
 
-    function generateMathProblem() {
-        let n1 = Math.floor(Math.random() * 50) + 10;
-        let n2 = Math.floor(Math.random() * 30) + 5;
-        currentAns = n1 + n2;
-        let qBox = document.getElementById('math-question');
-        if (qBox) qBox.innerText = `টাস্ক: ${n1} + ${n2} = কত?`;
-    }
+    <!-- ৩. স্পিন ট্যাব (নতুন লাকি স্পিন ফিচার) -->
+    <div id="spinSection" class="app-section">
+      <div class="section-header" style="margin-top:0;">🎡 লাকি স্পিন ও বোনাস</div>
+      <div class="card-box spin-box">
+        <div class="card-title" style="justify-content: center;">চাকা ঘুরিয়ে বোনাস জিতে নিন</div>
+        <div class="wheel" id="spinWheel"><div class="wheel-inner">SPIN</div></div>
+        <button class="btn-order-submit" onclick="startSpin()">স্পিন করুন (Spin Now)</button>
+      </div>
+    </div>
 
-    function checkDailyReset() {
-        let phone = localStorage.getItem('currentUser');
-        if (!phone) return;
-        let users = JSON.parse(localStorage.getItem('users')) || {};
-        let u = users[phone];
-        if (!u) return;
-        let today = new Date().toLocaleDateString();
+    <!-- ৪. উইথড্র ট্যাব -->
+    <div id="withdrawSection" class="app-section">
+      <div class="section-header" style="margin-top:0;">💸 উইথড্র (টাকা উত্তোলন)</div>
+      <div class="card-box">
+        <div style="font-size: 12px; color: #8b949e; margin-bottom: 10px;">আপনার উত্তোলনযোগ্য ব্যালেন্স: <b style="color: #238636; font-size: 16px;">৳ ৫০</b></div>
+        <input type="number" class="custom-input uid-input" placeholder="উত্তোলনের পরিমাণ (ন্যূনতম ৫০০ টাকা)" style="margin-bottom: 10px;" id="withdrawAmount">
+        <input type="text" class="custom-input uid-input" placeholder="আপনার বিকাশ/নগদ পার্সোনাল নম্বর" style="margin-bottom: 10px;" id="withdrawNumber">
+        <button class="btn-order-submit" style="background: #da3633;" onclick="requestWithdraw()">উইথড্র রিকোয়েস্ট পাঠান</button>
+      </div>
+    </div>
 
-        if (u.lastTaskDate !== today) {
-            u.lastTaskDate = today;
-            if (u.level === 'ব্রোঞ্জ প্যানেল') { u.tasksLeft = 6; u.rewardPerTask = 50; }
-            else if (u.level === 'সিলভার প্যানেল') { u.tasksLeft = 5; u.rewardPerTask = 100; }
-            else if (u.level === 'গোল্ড ভিআইপি') { u.tasksLeft = 10; u.rewardPerTask = 200; }
-            else { u.tasksLeft = 0; u.rewardPerTask = 0; }
-            localStorage.setItem('users', JSON.stringify(users));
-        }
-    }
+    <!-- ৫. আমার অর্ডার ও হিস্টরি ট্যাব -->
+    <div id="ordersSection" class="app-section">
+      <div class="section-header" style="margin-top:0;">📦 My Orders Status</div>
+      <div id="ordersContainer"></div>
+    </div>
 
-    function submitMathTask() {
-        let phone = localStorage.getItem('currentUser');
-        let users = JSON.parse(localStorage.getItem('users')) || {};
-        let u = users[phone];
+    <!-- ৬. একাউন্ট / প্রফাইল ট্যাব -->
+    <div id="accountSection" class="app-section">
+      <div class="section-header" style="margin-top:0;">👤 User Account & Admin</div>
+      <div class="card-box">
+        <div class="card-box-title">গুগল অ্যাকাউন্ট ও লগইন</div>
+        <div id="userInfoSection" style="font-size: 12px; color: #c9d1d9; margin-bottom: 15px;">
+          লগইন করা নেই। গুগল দিয়ে সাইন-ইন করুন:
+        </div>
+        <button class="google-btn" onclick="loginWithGoogle()">Google Sign-In</button>
+        <button class="whatsapp-btn" onclick="openWhatsAppChat()">WhatsApp Support</button>
+      </div>
+    </div>
 
-        if (u.tasksLeft <= 0 || !u.rewardPerTask) {
-            showAlert("আজকের সব কাজ শেষ অথবা কোনো সক্রিয় প্যাকেজ নেই!", "error");
-            return;
-        }
+    <!-- ৭. অ্যাডমিন প্যানেল সেকশন -->
+    <div id="adminPanelSection" class="app-section">
+      <div class="section-header" style="margin-top:0;">🛠️ Admin Control Panel</div>
+      <div class="card-box">
+        <div style="font-size: 12px; color: #238636; font-weight: bold; margin-bottom: 10px;">স্বাগতম অ্যাডমিন!</div>
+        <div style="background: #161b22; padding: 12px; border-radius: 8px; border: 1px solid #30363d; font-size: 12px; line-height: 1.6; margin-bottom: 15px;">
+          - মোট অর্ডার সংখ্যা: <b id="adminTotalOrders">0</b> টি<br>
+          - সিস্টেম স্ট্যাটাস: <b style="color: #238636;">সচল (Active)</b>
+        </div>
+        <div class="card-box-title">সকল কাস্টমার অর্ডারসমূহ:</div>
+        <div id="adminOrdersContainer"></div>
+      </div>
+    </div>
 
-        let ansInput = document.getElementById('math-answer');
-        let userVal = parseInt(ansInput.value);
+    <!-- নিচের ফিক্সড ন্যাভবার (ভিডিওর মতো সিরিয়াল সিকোয়েন্স) -->
+    <div class="bottom-nav">
+      <a class="nav-item active" onclick="switchTab('homeSection', this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+        হোম
+      </a>
+      <a class="nav-item" onclick="switchTab('depositSection', this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4"/></svg>
+        ডিপোজিট
+      </a>
+      <a class="nav-item" onclick="switchTab('spinSection', this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        স্পিন
+      </a>
+      <a class="nav-item" onclick="switchTab('withdrawSection', this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        উইথড্র
+      </a>
+      <a class="nav-item" onclick="switchTab('ordersSection', this)">
+        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        অর্ডার
+      </a>
+    </div>
 
-        if (userVal === currentAns) {
-            u.balance += u.rewardPerTask;
-            u.tasksLeft -= 1;
-            u.history = u.history || [];
-            u.history.unshift(`টাস্ক সম্পন্ন: +৳${u.rewardPerTask}`);
-            localStorage.setItem('users', JSON.stringify(users));
-            loadDashboard();
-            showAlert(`সঠিক উত্তর! অ্যাকাউন্টে ৳${u.rewardPerTask} যোগ হয়েছে।`, "success");
-            ansInput.value = '';
-            generateMathProblem();
-        } else {
-            showAlert("ভুল উত্তর! আবার চেষ্টা করুন।", "error");
-        }
-    }
+  </div>
 
-    function registerUser() {
-        let name = document.getElementById('reg-name').value;
-        let phone = document.getElementById('reg-phone').value;
-        let pass = document.getElementById('reg-pass').value;
-        let ref = document.getElementById('reg-ref').value;
+  <!-- সফল অর্ডার পপআপ -->
+  <div id="successModal">
+    <div class="modal-content">
+      <div class="modal-icon">✅</div>
+      <div class="modal-title">অর্ডার সফলভাবে কনফার্ম হয়েছে!</div>
+      <div class="modal-desc">আপনার পেমেন্ট ও ট্রানজেকশন সফলভাবে জমা হয়েছে। ৫ মিনিটের মধ্যে গেম আইডিতে টপআপ প্রদান করা হবে।</div>
+      <button class="modal-btn" onclick="closeSuccessModal()">ঠিক আছে</button>
+    </div>
+  </div>
 
-        if (!name || !phone || !pass) {
-            showAlert("সবগুলো ঘর পূরণ করুন!", "error");
-            return;
-        }
+  <script>
+    // Firebase Configuration
+    var firebaseConfig = {
+      apiKey: "AIzaSyD...",
+      authDomain: "your-app.firebaseapp.com",
+      projectId: "your-app",
+      storageBucket: "your-app.appspot.com",
+      messagingSenderId: "123456789",
+      appId: "1:123:web:abc"
+    };
+    
+    try {
+      firebase.initializeApp(firebaseConfig);
+    } catch(e) {}
 
-        let users = JSON.parse(localStorage.getItem('users')) || {};
-        if (users[phone]) {
-            showAlert("এই নম্বর দিয়ে ইতিমধ্যে অ্যাকাউন্ট আছে!", "error");
-            return;
-        }
+    var botToken = "8741226674:AAGxqQiuZZFCcYf9bXi8Q7dPKQWKaGKL7kA";
+    var chatID = "7639828202";
 
-        let startingBalance = 50;
-        if (ref && users[ref]) {
-            users[ref].balance += 30; // রেফার বোনাস
-            users[ref].history = users[ref].history || [];
-            users[ref].history.unshift(`রেফার বোনাস: +৳30`);
-        }
+    var selectedPackage = "";
+    var selectedPackagePrice = "";
+    var currentItemTitle = "";
+    var playerUID = "";
+    var selectedBkashNagadMethod = "bKash";
 
-        users[phone] = { name, phone, pass, balance: startingBalance, level: 'ফ্রি মেম্বার', tasksLeft: 0, rewardPerTask: 0, lastBonus: '', lastTaskDate: '', history: [`সাইন-আপ বোনাস: +৳${startingBalance}`] };
-        localStorage.setItem('users', JSON.stringify(users));
-        showAlert("সফলভাবে অ্যাকাউন্ট তৈরি হয়েছে! লগইন করুন।", "success");
-        switchPage('login-page');
-    }
+    var userOrders = JSON.parse(localStorage.getItem('hasan_gamer_orders')) || [];
 
-    function loginUser() {
-        let phone = document.getElementById('login-phone').value;
-        let pass = document.getElementById('login-pass').value;
+    // ট্যাব সুইচ করার মূল ফাংশন (ভিডিওর মতো সাজানো স্ক্রিন দেখানোর জন্য)
+    function switchTab(sectionId, element) {
+      document.querySelectorAll('.app-section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
 
-        let users = JSON.parse(localStorage.getItem('users')) || {};
-        if (users[phone] && users[phone].pass === pass) {
-            localStorage.setItem('currentUser', phone);
-            switchPage('dashboard-page');
-            showAlert("লগইন সফল হয়েছে!", "success");
-        } else {
-            showAlert("ভুল ফোন নম্বর বা পাসওয়ার্ড!", "error");
-        }
-    }
-
-    function loadDashboard() {
-        let phone = localStorage.getItem('currentUser');
-        let users = JSON.parse(localStorage.getItem('users')) || {};
-        if (users[phone]) {
-            let u = users[phone];
-            document.getElementById('user-balance').innerText = u.balance.toLocaleString();
-            document.getElementById('user-level').innerText = u.level;
-            document.getElementById('task-left').innerText = u.tasksLeft + " টি";
-            document.getElementById('my-ref-code').value = u.phone;
-
-            let historyBox = document.getElementById('history-box');
-            if (u.history && u.history.length > 0) {
-                historyBox.innerHTML = u.history.map(item => `<div>• ${item}</div>`).join('');
-            } else {
-                historyBox.innerHTML = "কোনো হিস্ট্রি নেই";
-            }
-        }
-    }
-
-    function copyRefLink() {
-        let copyText = document.getElementById("my-ref-code");
-        copyText.select();
-        navigator.clipboard.writeText(copyText.value);
-        showAlert("রেফার কোড কপি করা হয়েছে!", "success");
-    }
-
-    function claimDailyBonus() {
-        let phone = localStorage.getItem('currentUser');
-        let users = JSON.parse(localStorage.getItem('users')) || {};
-        let today = new Date().toLocaleDateString();
-
-        if (users[phone].lastBonus === today) {
-            showAlert("আজকের বোনাস আগেই নেওয়া হয়েছে!", "error");
-        } else {
-            users[phone].balance += 20;
-            users[phone].lastBonus = today;
-            users[phone].history = users[phone].history || [];
-            users[phone].history.unshift("ডেইলি বোনাস: +৳20");
-            localStorage.setItem('users', JSON.stringify(users));
-            loadDashboard();
-            showAlert("ডেইলি বোনাস হিসেবে ৳২০ যোগ হয়েছে!", "success");
-        }
-    }
-
-    function depositMoney() {
-        let amount = parseInt(document.getElementById('dep-amount').value);
-        let trx = document.getElementById('dep-trx').value;
-        let phone = localStorage.getItem('currentUser');
-        let users = JSON.parse(localStorage.getItem('users')) || {};
-
-        if (amount >= 100 && trx) {
-            users[phone].balance += amount;
-            users[phone].history = users[phone].history || [];
-            users[phone].history.unshift(`ডিপোজিট: +৳${amount}`);
-            localStorage.setItem('users', JSON.stringify(users));
-            loadDashboard();
-            showAlert("৳" + amount + " সফলভাবে ডিপোজিট হয়েছে!", "success");
-            document.getElementById('dep-amount').value = '';
-            document.getElementById('dep-trx').value = '';
-        } else {
-            showAlert("কমপক্ষে ১০০ টাকা এবং সঠিক TrxID দিন।", "error");
-        }
-    }
-
-    function withdrawMoney() {
-        let amount = parseInt(document.getElementById('w-amount').value);
-        let phone = localStorage.getItem('currentUser');
-        let users = JSON.parse(localStorage.getItem('users')) || {};
-
-        if (amount >= 500 && users[phone].balance >= amount) {
-            users[phone].balance -= amount;
-            users[phone].history = users[phone].history || [];
-            users[phone].history.unshift(`উইথড্র: -৳${amount}`);
-            localStorage.setItem('users', JSON.stringify(users));
-            loadDashboard();
-            showAlert("৳" + amount + " উত্তোলনের রিকোয়েস্ট পাঠানো হয়েছে!", "success");
-            document.getElementById('w-amount').value = '';
-        } else {
-            showAlert("পর্যাপ্ত ব্যালেন্স নেই অথবা ন্যূনতম ৫০০ টাকা দিতে হবে।", "error");
-        }
-    }
-
-    function buyPackage(cost, levelName, totalTasks, reward) {
-        let phone = localStorage.getItem('currentUser');
-        let users = JSON.parse(localStorage.getItem('users')) || {};
-
-        if (users[phone].balance >= cost) {
-            users[phone].balance -= cost;
-            users[phone].level = levelName;
-            users[phone].tasksLeft = totalTasks;
-            users[phone].rewardPerTask = reward;
-            users[phone].history = users[phone].history || [];
-            users[phone].history.unshift(`প্যাকেজ ক্রয়: ${levelName}`);
-
-            localStorage.setItem('users', JSON.stringify(users));
-            loadDashboard();
-            showAlert("অভিনন্দন! '" + levelName + "' প্যাকেজটি চালু হয়েছে।", "success");
-        } else {
-            showAlert("অ্যাকাউন্টে পর্যাপ্ত ব্যালেন্স নেই!", "error");
-        }
-    }
-
-    function logoutUser() {
-        localStorage.removeItem('currentUser');
-        switchPage('login-page');
-        showAlert("লগআউট করা হয়েছে।", "success");
+      if (element) {
+        document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+      }
+      window.scrollTo(0, 0);
     }
 
     window.onload = function() {
-        if (localStorage.getItem('currentUser')) {
-            switchPage('dashboard-page');
-        } else {
-            switchPage('login-page');
+      firebase.auth().onAuthStateChanged(function(user) {
+        if (user) {
+          document.getElementById("headerAvatar").innerText = user.displayName ? user.displayName.charAt(0).toUpperCase() : "U";
+          var infoDiv = document.getElementById("userInfoSection");
+          infoDiv.innerHTML = `
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+              <img src="${user.photoURL || 'https://via.placeholder.com/40'}" style="width:40px; height:40px; border-radius:50%;">
+              <div>
+                <b>${user.displayName}</b><br>
+                <span style="color:#8b949e; font-size:11px;">${user.email}</span>
+              </div>
+            </div>
+            <button onclick="logoutGoogle()" style="background:#da3633; color:#fff; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; font-size:12px; font-weight:bold;">লগআউট করুন</button>
+          `;
         }
+      });
+      renderOrders();
     };
-</script>
+
+    function loginWithGoogle() {
+      var provider = new firebase.auth.GoogleAuthProvider();
+      firebase.auth().signInWithPopup(provider).then(function() {
+        alert("সফলভাবে লগইন হয়েছে!");
+      }).catch(function(error) {
+        alert("লগইন ব্যর্থ হয়েছে: " + error.message);
+      });
+    }
+
+    function logoutGoogle() {
+      firebase.auth().signOut().then(function() {
+        alert("লগআউট সফল হয়েছে!");
+        location.reload();
+      });
+    }
+
+    function openWhatsAppChat() {
+      window.open("https://wa.me/8801960931813?text=Hello%20Hasan%20Gamer%2C%20I%20need%20support.", "_blank");
+    }
+
+    // অ্যাডমিন প্যানেল খোলার শর্টকাট (প্রোফাইল আইকনে ডাবল ক্লিক)
+    document.getElementById("headerAvatar").ondblclick = function() {
+      switchTab('adminPanelSection', null);
+      document.getElementById("adminTotalOrders").innerText = userOrders.length;
+      renderAdminOrders();
+    };
+
+    function openDetailPage(title, imgUrl) {
+      currentItemTitle = title;
+      selectedPackage = "";
+      selectedPackagePrice = "";
+      
+      switchTab('detailSection', null);
+      document.getElementById("detailTitle").innerText = title;
+      document.getElementById("detailImg").src = imgUrl;
+
+      var container = document.getElementById("packagesContainer");
+      container.innerHTML = "";
+
+      var packagesList = [];
+      if (title === "FF ID Likes") {
+        packagesList = [
+          { name: "200 FF LIKE", price: "20 TK" },
+          { name: "400 FF LIKE", price: "40 TK" },
+          { name: "3000 FF LIKE", price: "300 TK" },
+          { name: "6000 FF LIKE", price: "600 TK" }
+        ];
+      } else if (title === "UID টপআপ") {
+        packagesList = [
+          { name: "Weekly", price: "140 TK" },
+          { name: "Monthly", price: "700 TK" },
+          { name: "25 Diamond", price: "20 TK" },
+          { name: "50 Diamond", price: "45 TK" },
+          { name: "115 Diamond", price: "87 TK" },
+          { name: "240 Diamond", price: "164 TK" }
+        ];
+      } else {
+        packagesList = [
+          { name: "WeeklyLIT", price: "30 TK" },
+          { name: "Monthly", price: "700 TK" },
+          { name: "1Weekly + 1Monthly", price: "850 TK" }
+        ];
+      }
+
+      packagesList.forEach(function(pkg) {
+        var div = document.createElement("div");
+        div.className = "package-option";
+        div.innerHTML = `
+          <div class="pkg-left"><div class="pkg-radio"></div><div class="package-name">${pkg.name}</div></div>
+          <div class="package-price">${pkg.price}</div>
+        `;
+        div.onclick = function() { selectPkg(div, pkg.name, pkg.price); };
+        container.appendChild(div);
+      });
+    }
+
+    function selectPkg(element, name, price) {
+      document.querySelectorAll(".package-option").forEach(o => o.classList.remove("selected"));
+      element.classList.add("selected");
+      selectedPackage = name;
+      selectedPackagePrice = price;
+    }
+
+    function goToPaymentFromDetail() {
+      playerUID = document.getElementById("playerUID").value;
+      if (!selectedPackage) {
+        alert("দয়া করে যেকোনো একটি প্যাকেজ সিলেক্ট করুন!");
+        return;
+      }
+      if (!playerUID) {
+        alert("দয়া করে সঠিক গেম আইডি কোড দিন!");
+        return;
+      }
+
+      document.getElementById("payAmountDisplay").innerText = selectedPackagePrice;
+      switchTab('depositSection', document.querySelectorAll('.nav-item')[1]);
+    }
+
+    function selectBkashNagad(method, element) {
+      selectedBkashNagadMethod = method;
+      document.querySelectorAll(".pay-type-card").forEach(c => c.classList.remove("selected"));
+      element.classList.add("selected");
+    }
+
+    function copyPayNumber() {
+      navigator.clipboard.writeText("01972839306").then(function() {
+        alert("নম্বর কপি সফল হয়েছে!");
+      });
+    }
+
+    function submitOrder() {
+      var senderNumber = document.getElementById("senderNumberInput").value;
+      var trxID = document.getElementById("trxIDInput").value;
+      
+      if (!senderNumber || !trxID) {
+        alert("দয়া করে সেন্ডার নম্বর এবং ট্রানজেকশন আইডি দিন!");
+        return;
+      }
+
+      var text = "🔥 *HASAN GAMER BD TOPUP ORDER* 🔥\n\n" +
+                 "🎮 *Service:* " + (currentItemTitle || 'General') + "\n" +
+                 "💎 *Package:* " + (selectedPackage || 'Custom') + " (" + selectedPackagePrice + ")\n" +
+                 "🆔 *UID:* " + (playerUID || 'N/A') + "\n" +
+                 "💳 *Method:* " + selectedBkashNagadMethod + "\n" +
+                 "📱 *Sender:* " + senderNumber + "\n" +
+                 "🧾 *TrxID:* " + trxID;
+
+      fetch("https://api.telegram.org/bot" + botToken + "/sendMessage", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatID, text: text, parse_mode: "Markdown" })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if(data.ok) {
+          var newOrder = {
+            title: currentItemTitle || 'Topup Order',
+            pkg: selectedPackage || 'Custom',
+            price: selectedPackagePrice || '0 TK',
+            uid: playerUID || 'N/A',
+            sender: senderNumber,
+            trx: trxID,
+            method: selectedBkashNagadMethod,
+            status: "Pending"
+          };
+          userOrders.unshift(newOrder);
+          localStorage.setItem('hasan_gamer_orders', JSON.stringify(userOrders));
+          renderOrders();
+
+          document.getElementById("successModal").style.display = "flex";
+        } else {
+          alert("অর্ডার পাঠাতে সমস্যা হয়েছে!");
+        }
+      });
+    }
+
+    function closeSuccessModal() {
+      document.getElementById("successModal").style.display = "none";
+      switchTab('homeSection', document.querySelectorAll('.nav-item')[0]);
+    }
+
+    function renderOrders() {
+      var container = document.getElementById("ordersContainer");
+      container.innerHTML = "";
+      if(userOrders.length === 0) {
+        container.innerHTML = `<div style="text-align: center; color: #8b949e; font-size: 13px; padding: 30px;">কোনো অর্ডার পাওয়া যায়নি!</div>`;
+        return;
+      }
+      userOrders.forEach(function(ord) {
+        var statusClass = ord.status === "Completed" ? "status-completed" : "status-pending";
+        var div = document.createElement("div");
+        div.className = "order-item-card";
+        div.innerHTML = `
+          <div class="order-info">
+            <h4>${ord.title}</h4>
+            <p>প্যাকেজ: ${ord.pkg} (${ord.price})</p>
+            <p>UID: ${ord.uid} | Trx: ${ord.trx}</p>
+          </div>
+          <div class="order-status ${statusClass}">${ord.status}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function renderAdminOrders() {
+      var container = document.getElementById("adminOrdersContainer");
+      container.innerHTML = "";
+      if(userOrders.length === 0) {
+        container.innerHTML = `<div style="color: #8b949e; font-size: 12px;">কোনো অর্ডার নেই।</div>`;
+        return;
+      }
+      userOrders.forEach(function(ord, index) {
+        var div = document.createElement("div");
+        div.className = "order-item-card";
+        div.innerHTML = `
+          <div class="order-info">
+            <h4>${ord.title} - ${ord.pkg}</h4>
+            <p>UID: ${ord.uid} | Price: ${ord.price}</p>
+            <p>Sender: ${ord.sender} | Trx: ${ord.trx}</p>
+          </div>
+          <button onclick="completeOrder(${index})" style="background:#238636; color:#fff; border:none; padding:6px 10px; border-radius:6px; font-size:11px; cursor:pointer;">Complete</button>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function completeOrder(index) {
+      userOrders[index].status = "Completed";
+      localStorage.setItem('hasan_gamer_orders', JSON.stringify(userOrders));
+      renderAdminOrders();
+      renderOrders();
+      alert("অর্ডার কমপ্লিট করা হয়েছে!");
+    }
+
+    // স্পিন লজিক
+    let currentDegree = 0;
+    function startSpin() {
+      const wheel = document.getElementById("spinWheel");
+      let randomDegree = Math.floor(Math.random() * 3600) + 360;
+      currentDegree += randomDegree;
+      wheel.style.transform = `rotate(${currentDegree}deg)`;
+      
+      setTimeout(() => {
+        alert("স্পিন সফল! আপনি ১০ টাকা বোনাস পেয়েছেন।");
+      }, 3000);
+    }
+
+    function requestWithdraw() {
+      var amt = document.getElementById("withdrawAmount").value;
+      var num = document.getElementById("withdrawNumber").value;
+      if(!amt || !num || amt < 500) {
+        alert("দয়া করে সঠিক তথ্য দিন (ন্যূনতম উইথড্র ৫০০ টাকা)!");
+        return;
+      }
+      alert("আপনার উইথড্র রিকোয়েস্ট সফলভাবে জমা হয়েছে!");
+      switchTab('homeSection', document.querySelectorAll('.nav-item')[0]);
+    }
+  </script>
 
 </body>
 </html>
