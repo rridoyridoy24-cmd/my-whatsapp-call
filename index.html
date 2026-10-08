@@ -305,7 +305,7 @@
 
     const adminNumRef = ref(db, 'settings/adminNumber');
     onValue(adminNumRef, (snapshot) => {
-      let num = snapshot.val() || "01700-000000 (Send Money)";
+      let num = snapshot.val() || "01972839306 (Send Money)";
       document.getElementById("displayAdminNumber").innerText = num;
     });
 
@@ -471,8 +471,8 @@
       setTimeout(() => {
         let newBal = userBalance + 20;
         update(ref(db, 'users/' + currentUser.uid), { balance: newBal }).then(() => {
-          alert("স্পিন সফল! আপনি ২০ টাকা বোনাস জিতেছেন।");
-          addHistory("লাকি স্পিন বোনাস", "+৳ ২০");
+          alert("স্পিন সফল! আপনি 0 টাকা বোনাস জিতেছেন।");
+          addHistory("লাকি স্পিন বোনাস", "+৳০");
         });
       }, 3000);
     }
@@ -480,7 +480,7 @@
     window.requestWithdraw = function() {
       let amt = parseInt(document.getElementById("withAmount").value);
       let num = document.getElementById("withNumber").value;
-      if (!amt || !num || amt < 500) { alert("ন্যূনতম ৫০০ টাকা এবং সঠিক নম্বর দিন!"); return; }
+      if (!amt || !num || amt < 1000) { alert("ন্যূনতম 1000 টাকা এবং সঠিক নম্বর দিন!"); return; }
       if (userBalance < amt) { alert("পর্যাপ্ত ব্যালেন্স নেই!"); return; }
 
       let newBal = userBalance - amt;
