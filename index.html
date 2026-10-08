@@ -49,6 +49,7 @@
 
     .btn-main { width: 100%; background: #238636; color: white; border: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 14px; cursor: pointer; transition: 0.2s; }
     .btn-main:hover { background: #2ea043; }
+    .btn-main:disabled { background: #30363d; color: #8b949e; cursor: not-allowed; }
 
     .payment-selector { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
     .pay-card { border: 1.5px solid #30363d; border-radius: 8px; padding: 10px; text-align: center; cursor: pointer; background: #161b22; color: #8b949e; font-weight: bold; font-size: 12px; }
@@ -93,7 +94,7 @@
     <!-- নোটিশ বার -->
     <div class="notice-box">
       <span class="notice-tag">NOTICE</span>
-      <marquee scrollamount="4">প্যাকেজ ক্রয় করুন এবং শুধু যোগ ও বিয়োগের টাস্ক সম্পন্ন করে রিয়েল-টাইমে আয় করুন!</marquee>
+      <marquee scrollamount="4">প্রতিদিন একবার স্পিন এবং প্রতিদিন ভিআইপি টাস্ক স্বয়ংক্রিয়ভাবে রিফ্রেশ হবে!</marquee>
     </div>
 
     <!-- ১. হোম সেকশন (ভিআইপি লিস্ট) -->
@@ -189,7 +190,7 @@
       </div>
     </div>
 
-    <!-- ৩. টাস্ক সেকশন (শুধু যোগ ও বিয়োগ) -->
+    <!-- ৩. টাস্ক সেকশন -->
     <div id="taskSection" class="app-section">
       <div class="card-box">
         <div class="card-title">🧠 যোগ ও বিয়োগ সমাধান টাস্ক</div>
@@ -208,7 +209,7 @@
       <div class="card-box spin-container">
         <div class="card-title" style="justify-content: center;">🎡 লাকি স্পিন হুইল</div>
         <div class="wheel" id="spinWheel"><div class="wheel-inner">SPIN</div></div>
-        <button class="btn-main" onclick="startSpin()">স্পিন করুন</button>
+        <button class="btn-main" id="spinBtn" onclick="startSpin()">স্পিন করুন (আজ বাকি ১ বার)</button>
       </div>
     </div>
 
@@ -286,19 +287,20 @@
     let activePackage = "ফ্রি মেম্বার";
     let remainingTasks = 0;
     let rewardPerTask = 0;
+    let lastTaskDate = "";
+    let lastSpinDate = "";
     let selectedPayMethod = "বিকাশ";
     let pendingPkgPrice = 0;
     let pendingPkgName = "";
     let pendingTasks = 0;
     let pendingReward = 0;
 
-    // শুধুমাত্র যোগ (+) এবং বিয়োগ (-) অংক রাখা হয়েছে
     const mathProblems = [
       { q: "১২ + ১৮ = ?", a: 30 },
       { q: "৮৫ - ২৫ = ?", a: 60 },
       { q: "৪৫ + ৫৫ = ?", a: 100 },
       { q: "১২০ - ৫০ = ?", a: 70 },
-      { q: "সোম ২৫ + ১৫ = ?", a: 40 },
+      { q: "২৫ + ১৫ = ?", a: 40 },
       { q: "১০০ - ৩০ = ?", a: 70 }
     ];
     let currentTaskIndex = 0;
@@ -328,7 +330,14 @@
       createUserWithEmailAndPassword(auth, email, pass)
       .then((userCredential) => {
         let uid = userCredential.user.uid;
-        set(ref(db, 'users/' + uid), { balance: 0, package: "ফ্রি মেম্বার", remainingTasks: 0, rewardPerTask: 0 });
+        set(ref(db, 'users/' + uid), { 
+          balance: 0, 
+          package: "ফ্রি মেম্বার", 
+          remainingTasks: 0, 
+          rewardPerTask: 0,
+          lastTaskDate: "",
+          lastSpinDate: "" 
+        });
         alert("সফলভাবে অ্যাকাউন্ট তৈরি হয়েছে!");
       })
       .catch((error) => { alert("ত্রুটি: " + error.message); });
@@ -354,15 +363,38 @@
         if(data) {
           userBalance = data.balance || 0;
           activePackage = data.package || "ফ্রি মেম্বার";
-          remainingTasks = data.remainingTasks || 0;
           rewardPerTask = data.rewardPerTask || 0;
+          lastSpinDate = data.lastSpinDate || "";
+          
+          let todayStr = new Date().toDateString();
+
+          // দৈনিক টাস্ক অটো রিসেট চেক
+          if (data.lastTaskDate !== todayStr && activePackage !== "ফ্রি মেম্বার") {
+            remainingTasks = 6; // প্রতিদিন ৬টি করে টাস্ক পাবেন
+            update(ref(db, 'users/' + uid), { remainingTasks: 6, lastTaskDate: todayStr });
+          } else {
+            remainingTasks = data.remainingTasks || 0;
+          }
 
           document.getElementById("userBalance").innerText = userBalance;
           document.getElementById("activeVipName").innerText = activePackage;
           document.getElementById("taskCount").innerText = remainingTasks + " টি";
+          
+          checkSpinAvailability(todayStr);
           loadMathQuestion();
         }
       });
+    }
+
+    function checkSpinAvailability(todayStr) {
+      let spinBtn = document.getElementById("spinBtn");
+      if (lastSpinDate === todayStr) {
+        spinBtn.disabled = true;
+        spinBtn.innerText = "আজকের স্পিন শেষ (আগামীকাল আবার পাবেন)";
+      } else {
+        spinBtn.disabled = false;
+        spinBtn.innerText = "স্পিন করুন (আজ বাকি ১ বার)";
+      }
     }
 
     window.switchTab = function(sectionId, element) {
@@ -394,10 +426,12 @@
       let trx = document.getElementById("payTrxId").value;
       if (!trx) { alert("ট্রানজেকশন আইডি দিন!"); return; }
 
+      let todayStr = new Date().toDateString();
       let updates = {
         package: pendingPkgName,
         remainingTasks: pendingTasks,
-        rewardPerTask: pendingReward
+        rewardPerTask: pendingReward,
+        lastTaskDate: todayStr
       };
 
       update(ref(db, 'users/' + currentUser.uid), updates)
@@ -420,7 +454,7 @@
         document.getElementById("mathAnswerInput").style.display = "block";
       } else {
         document.getElementById("taskStatusBadge").innerText = "সব টাস্ক সম্পন্ন!";
-        document.getElementById("mathQuestion").innerHTML = `<span style="color: #238636; font-size: 18px;">✔ আজকের সব কাজ সফলভাবে সম্পন্ন হয়েছে!</span>`;
+        document.getElementById("mathQuestion").innerHTML = `<span style="color: #238636; font-size: 18px;">✔ আজকের সব কাজ সফলভাবে সম্পন্ন হয়েছে! আগামীকাল আবার নতুন টাস্ক পাবেন।</span>`;
         document.getElementById("mathAnswerInput").style.display = "none";
       }
     }
@@ -432,7 +466,7 @@
         return;
       }
       if (remainingTasks <= 0) {
-        alert("আজকের আপনার সব টাস্ক শেষ!");
+        alert("আজকের আপনার সব টাস্ক শেষ! আগামীকাল আবার চেষ্টা করুন।");
         return;
       }
 
@@ -463,16 +497,29 @@
 
     let currentDegree = 0;
     window.startSpin = function() {
+      let todayStr = new Date().toDateString();
+      if (lastSpinDate === todayStr) {
+        alert("আপনি আজ ইতিমধ্যে একবার স্পিন করেছেন! আগামী কাল আবার চেষ্টা করুন।");
+        return;
+      }
+
       const wheel = document.getElementById("spinWheel");
       let randomDegree = Math.floor(Math.random() * 3600) + 360;
       currentDegree += randomDegree;
       wheel.style.transform = `rotate(${currentDegree}deg)`;
       
       setTimeout(() => {
-        let newBal = userBalance + 20;
-        update(ref(db, 'users/' + currentUser.uid), { balance: newBal }).then(() => {
-          alert("স্পিন সফল! আপনি 0 টাকা বোনাস জিতেছেন।");
-          addHistory("লাকি স্পিন বোনাস", "+৳০");
+        let spinReward = 20; // স্পিন বোনাস পরিমাণ
+        let newBal = userBalance + spinReward;
+        lastSpinDate = todayStr;
+
+        update(ref(db, 'users/' + currentUser.uid), { 
+          balance: newBal,
+          lastSpinDate: todayStr 
+        }).then(() => {
+          alert(`স্পিন সফল! আপনি ${spinReward} টাকা বোনাস জিতেছেন।`);
+          addHistory("লাকি স্পিন বোনাস", `+৳${spinReward}`);
+          checkSpinAvailability(todayStr);
         });
       }, 3000);
     }
@@ -480,14 +527,14 @@
     window.requestWithdraw = function() {
       let amt = parseInt(document.getElementById("withAmount").value);
       let num = document.getElementById("withNumber").value;
-      if (!amt || !num || amt < 1000) { alert("ন্যূনতম 1000 টাকা এবং সঠিক নম্বর দিন!"); return; }
+      if (!amt || !num || amt < 500) { alert("ন্যূনতম ৫০০ টাকা এবং সঠিক নম্বর দিন!"); return; }
       if (userBalance < amt) { alert("পর্যাপ্ত ব্যালেন্স নেই!"); return; }
 
       let newBal = userBalance - amt;
       update(ref(db, 'users/' + currentUser.uid), { balance: newBal }).then(() => {
         alert("উইথড্র রিকোয়েস্ট পাঠানো হয়েছে!");
         addHistory("উইথড্র রিকোয়েস্ট", `-৳ ${amt}`);
-        switchTab('homeSection', document.querySelectorAll('.nav-item')[0]);
+        switchTab('homeSystem', document.querySelectorAll('.nav-item')[0]);
       });
     }
 
